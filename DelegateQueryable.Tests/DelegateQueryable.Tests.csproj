@@ -50,9 +50,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DelegateQueryable\DelelgateQueryable.csproj">
+    <ProjectReference Include="..\DelegateQueryable\DelegateQueryable.csproj">
       <Project>{a4445a36-c2d6-4747-8f93-893bffd2ef76}</Project>
-      <Name>DelelgateQueryable</Name>
+      <Name>DelegateQueryable</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
