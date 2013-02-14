@@ -5,12 +5,15 @@ namespace DelegateQueryable
 {
     public class QueryVisitor : System.Linq.Expressions.ExpressionVisitor, QueryInfo
     {
+        private bool handled;
         public int Take { get; set; }
         public int Skip { get; set; }
 
-        public void Process(Expression expression)
+        public bool Process(Expression expression)
         {
+            handled = false;
             Visit((MethodCallExpression)expression);
+            return handled;
         }
 
         // override ExpressionVisitor method
@@ -22,21 +25,22 @@ namespace DelegateQueryable
                 {
                     Visit(m.Arguments[0]);
 
-                    ConstantExpression countExpression = (ConstantExpression)(m.Arguments[1]);
+                    var countExpression = (ConstantExpression)(m.Arguments[1]);
 
                     Skip = ((int)countExpression.Value);
-
+                    handled = true;
                     return m;
                 }
-                if (m.Method.Name.Equals("Take"))
+                else if (m.Method.Name.Equals("Take"))
                 {
                     Visit(m.Arguments[0]);
 
-                    ConstantExpression countExpression = (ConstantExpression)(m.Arguments[1]);
+                    var countExpression = (ConstantExpression)(m.Arguments[1]);
 
                     Take = ((int)countExpression.Value);
+                    handled = true;
                     return m;
-                }
+                } 
             }
 
             return m;

@@ -50,8 +50,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleQueryable\DelelgateQueryable.csproj">
-      <Project>{A4445A36-C2D6-4747-8F93-893BFFD2EF76}</Project>
+    <ProjectReference Include="..\DelegateQueryable\DelelgateQueryable.csproj">
+      <Project>{a4445a36-c2d6-4747-8f93-893bffd2ef76}</Project>
       <Name>DelelgateQueryable</Name>
     </ProjectReference>
   </ItemGroup>

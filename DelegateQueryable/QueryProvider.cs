@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -10,7 +11,7 @@ namespace DelegateQueryable
         private QueryVisitor _ev;
 
 
-        public QueryProvider(DataQuery<T> dataQuery,  QueryVisitor ev = null)
+        public QueryProvider(DataQuery<T> dataQuery, QueryVisitor ev = null)
         {
             _dataQuery = dataQuery;
             _ev = ev;
@@ -25,17 +26,55 @@ namespace DelegateQueryable
         {
             var ev = _ev ?? (_ev = new QueryVisitor());
             ev.Process(expression);
-            return new DelegateQueryable<TElement>((DataQuery<TElement>)(object)_dataQuery, expression, _ev);
+            if (ev.Skip == 0 || ev.Take == 0)
+            {
+                return new DelegateQueryable<TElement>((DataQuery<TElement>)(object)_dataQuery, expression, _ev);
+            }
+            else
+            {
+                return _dataQuery(ev).Cast<TElement>().ToArray().AsQueryable();
+            }
         }
 
-        public object Execute(Expression expression)
+
+        public IEnumerable<T> GetEnumerable()
         {
             return _dataQuery(_ev);
         }
 
+        object IQueryProvider.Execute(Expression expression)
+        {
+            return Execute<T>(expression);
+        }
+
         public TResult Execute<TResult>(Expression expression)
         {
-            throw new NotImplementedException();
+            return (TResult)_dataQuery(_ev).ToArray().AsQueryable().Provider.Execute(expression);
+        }
+    }
+
+    public class ExecuteVisitor<T> : ExpressionVisitor
+    {
+        private readonly QueryProvider<T> _queryProvider;
+        public object Result { get; set; }
+        public ExecuteVisitor(QueryProvider<T> queryProvider)
+        {
+            _queryProvider = queryProvider;
+        }
+
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+
+            if (node.Method.Name == "Count")
+            {
+                Result = _queryProvider.GetEnumerable().Count();
+            }
+            else
+            {
+
+                return base.VisitMethodCall(node);
+            }
+            return node;
         }
     }
 }

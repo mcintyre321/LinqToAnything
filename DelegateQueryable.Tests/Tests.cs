@@ -1,24 +1,30 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-
+using DelegateQueryable;
 namespace DelegateQueryable.Tests
 {
     [TestFixture]
     public class Tests
     {
         [Test]
-        public void Test()
+        public void CanSkipAndTake()
         {
-            var items = Enumerable.Range(1, 1001);
-            var getPage = new DataQuery<int>((info) => items.Skip(info.Skip).Take(info.Take));
+            DataQuery<string> getPageFromDataSource = (info) => SomeDataSource(info.Skip, info.Take);
 
-            var pq = new DelegateQueryable<int>(getPage);
+            IQueryable<string> pq = new DelegateQueryable<string>(getPageFromDataSource);
             
-            Assert.AreEqual("1,2,3,4,5,6,7,8,9,10", string.Join(",", pq.Take(10).Skip(0)));
-            
-            var queryable = pq.Skip(3).Take(10);
+            var items = pq.Skip(3).Take(2);
 
-            Assert.AreEqual("4,5,6,7,8,9,10,11,12,13", string.Join(",", queryable));
+            Assert.AreEqual("Item 4,Item 5", string.Join(",", items));
+
+        }
+
+        static IEnumerable<string> SomeDataSource(int startIndex, int pageSize)
+        {
+            var items = Enumerable.Range(1, 1001).Select(i => "Item " + i);
+            return items.Skip(startIndex).Take(pageSize);
         }
     }
     

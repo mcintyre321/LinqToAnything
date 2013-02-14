@@ -43,12 +43,12 @@ namespace DelegateQueryable
 
         public IEnumerator<T> GetEnumerator()
         {
-            return ((IEnumerable<T>)this.provider.Execute(this.expression)).GetEnumerator();
+            return this.provider.GetEnumerable().GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)this.provider.Execute(this.expression)).GetEnumerator();
+            return GetEnumerator();
         }
 
 
