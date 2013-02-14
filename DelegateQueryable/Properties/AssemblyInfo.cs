@@ -5,14 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SimpleQueryable")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("DelegateQueryable")]
+[assembly: AssemblyDescription("Turn a non queryable data source into a (limited) IQueryable. https://github.com/mcintyre321/DelegateQueryable ")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SimpleQueryable")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyProduct("DelegateQueryable")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
