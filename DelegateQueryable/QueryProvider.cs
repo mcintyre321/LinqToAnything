@@ -39,7 +39,7 @@ namespace DelegateQueryable
 
         public IEnumerable<T> GetEnumerable()
         {
-            return _dataQuery(_ev);
+            return _dataQuery(_ev ?? new QueryVisitor());
         }
 
         object IQueryProvider.Execute(Expression expression)

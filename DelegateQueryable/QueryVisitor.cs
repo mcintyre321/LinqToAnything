@@ -6,7 +6,7 @@ namespace DelegateQueryable
     public class QueryVisitor : System.Linq.Expressions.ExpressionVisitor, QueryInfo
     {
         private bool handled;
-        public int Take { get; set; }
+        public int? Take { get; set; }
         public int Skip { get; set; }
 
         public bool Process(Expression expression)
