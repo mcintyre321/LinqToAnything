@@ -14,7 +14,7 @@ namespace DelegateQueryable
         public QueryProvider(DataQuery<T> dataQuery, QueryVisitor ev = null)
         {
             _dataQuery = dataQuery;
-            _ev = ev;
+            _ev = ev ?? new QueryVisitor();
         }
 
         public IQueryable CreateQuery(Expression expression)
@@ -26,20 +26,26 @@ namespace DelegateQueryable
         {
             var ev = _ev ?? (_ev = new QueryVisitor());
             ev.Process(expression);
-            if (ev.Skip == 0 || ev.Take == 0)
+            if (typeof(TElement) != typeof(T))
             {
-                return new DelegateQueryable<TElement>((DataQuery<TElement>)(object)_dataQuery, expression, _ev);
+                DataQuery<TElement> q = info => _dataQuery(info).Select(ev.Transform<T, TElement>());
+                return new DelegateQueryable<TElement>(q, expression, _ev);
             }
-            else
-            {
-                return _dataQuery(ev).Cast<TElement>().ToArray().AsQueryable();
-            }
+            return new DelegateQueryable<TElement>((DataQuery<TElement>) ((object)_dataQuery), expression, _ev);
+ 
         }
 
 
-        public IEnumerable<T> GetEnumerable()
+        public IEnumerable<TResult> GetEnumerable<TResult>()
         {
-            return _dataQuery(_ev ?? new QueryVisitor());
+            var queryVisitor = _ev ?? new QueryVisitor();
+            var results = _dataQuery(queryVisitor);
+            //if (queryVisitor.Select != null)
+            //{
+            //    var projectionFunc = (Func<T, TResult>)queryVisitor.Select.Lambda.Compile();
+            //    return results.Select(projectionFunc);
+            //}
+            return (IEnumerable<TResult>) results;
         }
 
         object IQueryProvider.Execute(Expression expression)
@@ -50,31 +56,6 @@ namespace DelegateQueryable
         public TResult Execute<TResult>(Expression expression)
         {
             return (TResult)_dataQuery(_ev).ToArray().AsQueryable().Provider.Execute(expression);
-        }
-    }
-
-    public class ExecuteVisitor<T> : ExpressionVisitor
-    {
-        private readonly QueryProvider<T> _queryProvider;
-        public object Result { get; set; }
-        public ExecuteVisitor(QueryProvider<T> queryProvider)
-        {
-            _queryProvider = queryProvider;
-        }
-
-        protected override Expression VisitMethodCall(MethodCallExpression node)
-        {
-
-            if (node.Method.Name == "Count")
-            {
-                Result = _queryProvider.GetEnumerable().Count();
-            }
-            else
-            {
-
-                return base.VisitMethodCall(node);
-            }
-            return node;
         }
     }
 }
