@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace DelegateQueryable
+namespace LinqToAnything
 {
     public class DelegateQueryable<T> : IQueryable<T>
     {

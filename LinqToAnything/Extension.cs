@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace DelegateQueryable
+namespace LinqToAnything
 {
     public static class Extension
     {

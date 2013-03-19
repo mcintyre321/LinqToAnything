@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using DelegateQueryable;
-namespace DelegateQueryable.Tests
+using LinqToAnything;
+namespace LinqToAnything.Tests
 {
     [TestFixture]
     public class Tests

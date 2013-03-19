@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace DelegateQueryable
+namespace LinqToAnything
 {
     public static class ExpressionUtils
     {

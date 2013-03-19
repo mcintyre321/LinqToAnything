@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace DelegateQueryable
+namespace LinqToAnything
 {
     public delegate IEnumerable<T> DataQuery<out T>(QueryInfo info);
 }

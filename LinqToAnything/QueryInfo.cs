@@ -1,4 +1,4 @@
-namespace DelegateQueryable
+namespace LinqToAnything
 {
     public interface QueryInfo
     {

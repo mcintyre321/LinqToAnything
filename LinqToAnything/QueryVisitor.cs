@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace DelegateQueryable
+namespace LinqToAnything
 {
     public class QueryVisitor : System.Linq.Expressions.ExpressionVisitor, QueryInfo
     {
