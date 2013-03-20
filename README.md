@@ -8,7 +8,9 @@ data access methods, be they stored procedures or web requests or whatever.
 
 Take one paged data access method:
 
-`public void IEnumerable<Product> GetProducts(int pageIndex, int pageSize);
+```
+public void IEnumerable<Product> GetProducts(int pageIndex, int pageSize);
+```
 
 Wrap it as a [DataQuery](https://github.com/mcintyre321/LinqToAnything/blob/master/LinqToAnything/DataQuery.cs) delegate:
 
@@ -19,4 +21,5 @@ DataQuery<Customer> dataQuery = queryInfo => GetProducts(queryInfo.Take / queryI
 IQuerable<Customer> queryable = new DelegateQueryable<string>(dataQuery)
 ```
 
-Now use your queryable as you will. Note that LINQ operators other than Skip, Take or Select will not work.
+Now use your queryable as you will. Note that LINQ operators other than Skip, Take or Select will not work. At some point 
+the QueryInfo will be extended with more information about the query.
