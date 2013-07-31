@@ -15,10 +15,10 @@ public void IEnumerable<Product> GetProducts(int pageIndex, int pageSize);
 Wrap it as a [DataQuery](https://github.com/mcintyre321/LinqToAnything/blob/master/LinqToAnything/DataQuery.cs) delegate:
 
 ```
-DataQuery<Customer> dataQuery = queryInfo => GetProducts(queryInfo.Take / queryInfo.Skip, queryInfo.Skip);
+DataQuery<Product> dataQuery = queryInfo => GetProducts(queryInfo.Take / queryInfo.Skip, queryInfo.Skip);
                                                          //notice that we have mapped Skip and Take into paging parameters
 
-IQuerable<Customer> queryable = new DelegateQueryable<string>(dataQuery)
+IQuerable<Product> queryable = new DelegateQueryable<string>(dataQuery)
 ```
 
 Now use your queryable as you will. Note that LINQ operators other than Skip, Take or Select will not work. At some point 
