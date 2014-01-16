@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace LinqToAnything
 {
-    public class DelegateQueryable<T> : IQueryable<T>
+    public class DelegateQueryable<T> : IOrderedQueryable<T>
     {
         QueryProvider<T> provider;
         Expression expression;

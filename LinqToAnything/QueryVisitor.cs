@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace LinqToAnything
 {
@@ -8,7 +10,8 @@ namespace LinqToAnything
     {
         public int? Take { get; set; }
         public int Skip { get; set; }
-
+        public OrderBy OrderBy { get; set; }
+        
         public void Process(Expression expression)
         {
             Visit(expression);
@@ -49,6 +52,12 @@ namespace LinqToAnything
                         Lambda = lambda,
                         LambdaBody = body
                     };
+                }else if (m.Method.Name.Contains("OrderByDescending"))
+                {
+                    MethodCallExpression call = m;
+                    var lambda = (LambdaExpression)ExpressionUtils.RemoveQuotes(call.Arguments[1]);
+                    var lambdaBody = (MemberExpression) ExpressionUtils.RemoveQuotes(lambda.Body);
+                    OrderBy = new OrderBy(lambdaBody.Member.Name, OrderBy.OrderByDirection.Desc);
                 }
             }
 
@@ -62,5 +71,23 @@ namespace LinqToAnything
             if (Select == null) return new Func<TIn, TOut>(i => (TOut) (object) i);
             return (Func<TIn, TOut>)Select.Lambda.Compile();
         }
+    }
+
+    public class OrderBy
+    {
+        public OrderBy(string name, OrderByDirection direction)
+        {
+            Name = name;
+            Direction = direction;
+        }
+
+        public enum OrderByDirection
+        {
+            Asc,Desc
+        }
+        public string Name { get; private set; }
+        public OrderByDirection Direction { get; private set; }
+
+         
     }
 }

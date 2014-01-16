@@ -4,5 +4,6 @@ namespace LinqToAnything
     {
         int? Take { get; }
         int Skip { get; }
+        OrderBy OrderBy { get; }
     }
 }
