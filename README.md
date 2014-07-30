@@ -6,6 +6,7 @@ Linq To Anything
 This bombastically titled library is, in a nutshell, an IQueryable<T> wrapper for your non-iqueryable (but pageable) 
 data access methods, be they stored procedures or web requests or whatever. 
 
+
 Take one paged data access method:
 
 ```
@@ -21,5 +22,9 @@ DataQuery<Product> dataQuery = queryInfo => GetProducts(queryInfo.Take / queryIn
 IQuerable<Product> queryable = new DelegateQueryable<string>(dataQuery)
 ```
 
-Now use your queryable as you will. Note that LINQ operators other than Skip, Take or Select will not work. At some point 
-the QueryInfo will be extended with more information about the query.
+Basically, the queryInfo object provides a simplified view of the expression tree which you can then map to your data source.
+
+Please see [QueryInfo.cs](https://github.com/mcintyre321/LinqToAnything/blob/master/LinqToAnything/QueryInfo.cs) for info on what queries are supported, and what operators you can use.
+
+Skip, Take, Orderby and simple Where clauses are supported (enough to do Datatables)
+
