@@ -31,6 +31,31 @@ namespace LinqToAnything.Tests
         }
 
         [Test]
+        public void CanDoACountWithAFilter()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var items = pq.Where(s => s.Name.Contains("07"));
+            var count = items.Count();
+
+            Assert.AreEqual(1, count);
+        }
+
+        [Test]
+        public void CanDoACountWithNoIllEffect()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+
+            var count = pq.Count();
+
+            Assert.AreEqual(10, count);
+        }
+
+
+        [Test]
         public void CanWorkWithoutQuery()
         {
             DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);

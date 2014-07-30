@@ -55,7 +55,33 @@ namespace LinqToAnything
 
         public TResult Execute<TResult>(Expression expression)
         {
-            return (TResult)_dataQuery(_ev).ToArray().AsQueryable().Provider.Execute(expression);
+            var data =  _dataQuery(_ev).ToArray().AsQueryable();
+            data = QueryInterceptor.QueryableExtensions.InterceptWith(data, new SwitchoutVisitor<DelegateQueryable<T>>(data));
+            return (TResult) data.Provider.Execute(expression);
+        }
+    }
+
+    public class SwitchoutVisitor<T> : ExpressionVisitor
+    {
+        private readonly object data;
+
+        public SwitchoutVisitor(object data)
+        {
+            this.data = data;
+        }
+
+        public override Expression Visit(Expression node)
+        {
+            return base.Visit(node);
+        }
+
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            if (node.Value.GetType() == typeof (T))
+            {
+                return Expression.Constant(data);
+            }
+            return base.VisitConstant(node);
         }
     }
 }
