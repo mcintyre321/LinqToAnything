@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using NUnit.Framework;
 using LinqToAnything;
 using System.Linq.Dynamic;
@@ -11,6 +12,7 @@ namespace LinqToAnything.Tests
     {
         private static int Skipped;
         private static int? Taken;
+        private static IEnumerable<SomeEntity> Data = Enumerable.Range(1, 10).Select(i => new SomeEntity { Name = "Item " + i.ToString().PadLeft(2, '0') });
 
         [Test]
         public void CanSkipAndTake()
@@ -49,8 +51,35 @@ namespace LinqToAnything.Tests
         {
             DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
-            var items = pq.Select(s => new Projection(){ Item = s.Name });
+            var items = pq.Select(s => new Projection() { Item = s.Name });
             Assert.AreEqual("Item 01", items.ToArray().First().Item);
+        }
+
+        [Test]
+        public void CanHandleAMethodCallWhereClause()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var items = pq.Where(s => s.Name.Contains("07"));
+            Assert.AreEqual("Item 07", items.ToArray().Single().Name);
+        }
+
+        [Test]
+        public void CanHandleAnOperatorWhereClause()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var items = pq.Where(s => s.Name == "Item 07");
+            Assert.AreEqual("Item 07", items.ToArray().Single().Name);
+        }
+
+        [Test]
+        public void CanHandleAnEndsWithMethodCallWhereClause()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var items = pq.Where(s => s.Name.EndsWith("07"));
+            Assert.AreEqual("Item 07", items.ToArray().Single().Name);
         }
 
         [Test]
@@ -96,16 +125,33 @@ namespace LinqToAnything.Tests
         {
             Skipped = qi.Skip;
             Taken = qi.Take;
-            var items = Enumerable.Range(1, 10).Select(i => new SomeEntity{ Name = "Item " + i.ToString().PadLeft(2, '0')});
+            var query = Data.AsQueryable();
             if (qi.OrderBy != null)
             {
                 var clause = qi.OrderBy.Name;
                 if (qi.OrderBy.Direction == OrderBy.OrderByDirection.Desc) clause += " descending";
-                items = items.AsQueryable().OrderBy(clause);
+                query = query.OrderBy(clause);
             }
-            items = items.Skip(qi.Skip);
-            if (qi.Take != null) items = items.Take(qi.Take.Value);
-            return items;
+
+            int paramCount = 0;
+            foreach (var filter in qi.Filters)
+            {
+                if (filter.Operator == "Contains" || filter.Operator == "EndsWith")
+                {
+                    query = query.Where(filter.ColumnName + "." + filter.Operator + "(@" + paramCount + ")", filter.Value);
+                    paramCount++;
+                }
+                if (filter.Operator == "op_Equality")
+                {
+                    query = query.Where(filter.ColumnName + " == @" + paramCount + "", filter.Value);
+                    paramCount++;
+                }
+                
+            }
+
+            query = query.Skip(qi.Skip);
+            if (qi.Take != null) query = query.Take(qi.Take.Value);
+            return query.ToArray();
         }
     }
 
