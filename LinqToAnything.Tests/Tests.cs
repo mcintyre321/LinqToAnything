@@ -134,16 +134,16 @@ namespace LinqToAnything.Tests
             }
 
             int paramCount = 0;
-            foreach (var filter in qi.Filters)
+            foreach (var filter in qi.Wheres)
             {
                 if (filter.Operator == "Contains" || filter.Operator == "EndsWith")
                 {
-                    query = query.Where(filter.ColumnName + "." + filter.Operator + "(@" + paramCount + ")", filter.Value);
+                    query = query.Where(filter.PropertyName + "." + filter.Operator + "(@" + paramCount + ")", filter.Value);
                     paramCount++;
                 }
                 if (filter.Operator == "op_Equality")
                 {
-                    query = query.Where(filter.ColumnName + " == @" + paramCount + "", filter.Value);
+                    query = query.Where(filter.PropertyName + " == @" + paramCount + "", filter.Value);
                     paramCount++;
                 }
                 

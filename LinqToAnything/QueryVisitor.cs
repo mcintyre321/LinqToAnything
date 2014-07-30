@@ -9,12 +9,12 @@ namespace LinqToAnything
 {
     public class QueryVisitor : System.Linq.Expressions.ExpressionVisitor, QueryInfo
     {
-        private List<Filter> _filters = new List<Filter>();
+        private List<Where> _filters = new List<Where>();
         public int? Take { get; set; }
         public int Skip { get; set; }
         public OrderBy OrderBy { get; set; }
 
-        public IEnumerable<Filter> Filters { get { return _filters.AsReadOnly(); } }
+        public IEnumerable<Where> Wheres { get { return _filters.AsReadOnly(); } }
 
         public void Process(Expression expression)
         {
