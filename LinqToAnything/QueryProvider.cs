@@ -30,7 +30,7 @@ namespace LinqToAnything
             if (typeof(TElement) != typeof(T))
             {
                 DataQuery<TElement> q = info => _dataQuery(info).Select(queryVisitor.Transform<T, TElement>());
-                return new DelegateQueryable<TElement>(q, expression, _queryVisitor);
+                return new DelegateQueryable<TElement>(q, null, _queryVisitor);
             }
             return new DelegateQueryable<TElement>((DataQuery<TElement>) ((object)_dataQuery), expression, _queryVisitor);
  

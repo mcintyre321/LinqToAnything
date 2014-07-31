@@ -19,10 +19,9 @@ namespace LinqToAnything
 
         public DelegateQueryable(DataQuery<T> dataQuery, Expression expression, QueryVisitor ev)
         {
-            if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type)) throw new ArgumentOutOfRangeException("expression");
-
+            
             this.provider = new QueryProvider<T>(dataQuery, ev);
-            this.expression = expression;
+            this.expression = expression ?? Expression.Constant(this);
             
         }
 

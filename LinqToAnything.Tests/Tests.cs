@@ -67,6 +67,22 @@ namespace LinqToAnything.Tests
         }
 
 
+        [Test]
+        public void CanDoASelectWithNoIllEffectOnOtherQueries()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+
+            var pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource).Select(e => new SomeEntityVm()
+            {
+                Name = e.Name
+            });
+            Assert.AreEqual(5, pq.Take(5).Count());
+            Assert.AreEqual(10, pq.Count());
+        }
+
+
+
+
 
         [Test]
         public void CanWorkWithoutQuery()
@@ -191,6 +207,11 @@ namespace LinqToAnything.Tests
             if (qi.Take != null) query = query.Take(qi.Take.Value);
             return query.ToArray();
         }
+    }
+
+    public class SomeEntityVm
+    {
+        public string Name { get; set; }
     }
 
     public   class SomeEntity
