@@ -2,19 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using QueryInterceptor;
 
 namespace LinqToAnything
 {
     public class QueryProvider<T> : IQueryProvider
     {
         private readonly DataQuery<T> _dataQuery;
-        private QueryVisitor _ev;
+        private QueryVisitor _queryVisitor;
 
 
-        public QueryProvider(DataQuery<T> dataQuery, QueryVisitor ev = null)
+        public QueryProvider(DataQuery<T> dataQuery, QueryVisitor _queryVisitor = null)
         {
             _dataQuery = dataQuery;
-            _ev = ev ?? new QueryVisitor();
+            this._queryVisitor = _queryVisitor ?? new QueryVisitor();
         }
 
         public IQueryable CreateQuery(Expression expression)
@@ -24,21 +25,21 @@ namespace LinqToAnything
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
-            var ev = _ev ?? (_ev = new QueryVisitor());
-            ev.Process(expression);
+            var queryVisitor = _queryVisitor ?? (_queryVisitor = new QueryVisitor());
+            queryVisitor.Process(expression);
             if (typeof(TElement) != typeof(T))
             {
-                DataQuery<TElement> q = info => _dataQuery(info).Select(ev.Transform<T, TElement>());
-                return new DelegateQueryable<TElement>(q, expression, _ev);
+                DataQuery<TElement> q = info => _dataQuery(info).Select(queryVisitor.Transform<T, TElement>());
+                return new DelegateQueryable<TElement>(q, expression, _queryVisitor);
             }
-            return new DelegateQueryable<TElement>((DataQuery<TElement>) ((object)_dataQuery), expression, _ev);
+            return new DelegateQueryable<TElement>((DataQuery<TElement>) ((object)_dataQuery), expression, _queryVisitor);
  
         }
 
 
         public IEnumerable<TResult> GetEnumerable<TResult>()
         {
-            var queryVisitor = _ev ?? new QueryVisitor();
+            var queryVisitor = _queryVisitor ?? new QueryVisitor();
             var results = _dataQuery(queryVisitor);
             //if (queryVisitor.Select != null)
             //{
@@ -55,8 +56,8 @@ namespace LinqToAnything
 
         public TResult Execute<TResult>(Expression expression)
         {
-            var data =  _dataQuery(_ev).ToArray().AsQueryable();
-            data = QueryInterceptor.QueryableExtensions.InterceptWith(data, new SwitchoutVisitor<DelegateQueryable<T>>(data));
+            var data =  _dataQuery(new QueryVisitor()).ToArray().AsQueryable();
+            data = data.InterceptWith(new SwitchoutVisitor<DelegateQueryable<T>>(data));
             return (TResult) data.Provider.Execute(expression);
         }
     }

@@ -54,6 +54,19 @@ namespace LinqToAnything.Tests
             Assert.AreEqual(10, count);
         }
 
+        [Test]
+        public void CanDoATakeWithNoIllEffectOnOtherQueries()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var somethingElse = pq.Take(5);
+            Assert.AreEqual(5, somethingElse.Count());
+
+            Assert.AreEqual(10, pq.Count());
+        }
+
+
 
         [Test]
         public void CanWorkWithoutQuery()
