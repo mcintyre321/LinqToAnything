@@ -128,6 +128,16 @@ namespace LinqToAnything.Tests
         }
 
         [Test]
+        public void CanHandleAnAndAlsoWhereClause()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var items = pq.Where(s => s.Name == "Item 07" && s.Name == "Item 07");
+            Assert.AreEqual("Item 07", items.ToArray().Single().Name);
+        }
+
+
+        [Test]
         public void CanHandleAnEndsWithMethodCallWhereClause()
         {
             DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
@@ -187,18 +197,15 @@ namespace LinqToAnything.Tests
                 query = query.OrderBy(clause);
             }
 
-            int paramCount = 0;
             foreach (var filter in qi.Wheres)
             {
                 if (filter.Operator == "Contains" || filter.Operator == "EndsWith")
                 {
-                    query = query.Where(filter.PropertyName + "." + filter.Operator + "(@" + paramCount + ")", filter.Value);
-                    paramCount++;
+                    query = query.Where(filter.PropertyName + "." + filter.Operator + "(@0)", filter.Value);
                 }
                 if (filter.Operator == "op_Equality")
                 {
-                    query = query.Where(filter.PropertyName + " == @" + paramCount + "", filter.Value);
-                    paramCount++;
+                    query = query.Where(filter.PropertyName + " == @0", filter.Value);
                 }
                 
             }

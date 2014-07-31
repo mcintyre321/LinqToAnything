@@ -8,10 +8,6 @@ namespace LinqToAnything
     {
         private List<Where> _filters = new List<Where>();
         public IEnumerable<Where> Filters { get { return _filters.AsReadOnly(); } }
-        public override Expression Visit(Expression node)
-        {
-            return base.Visit(node);
-        }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
@@ -27,12 +23,21 @@ namespace LinqToAnything
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            var filter = new Where();
-            filter.PropertyName = ((MemberExpression) node.Left).Member.Name;
-            filter.Operator = node.Method.Name;
-            filter.Value = ((ConstantExpression) node.Right).Value;
-            _filters.Add(filter);
-            return base.VisitBinary(node);
+            if (node.NodeType == ExpressionType.AndAlso)
+            {
+               this.VisitBinary((BinaryExpression) node.Left);
+               this.VisitBinary((BinaryExpression)node.Right);
+               return node;
+            }
+            else
+            {
+                var filter = new Where();
+                filter.PropertyName = ((MemberExpression) node.Left).Member.Name;
+                filter.Operator = node.Method.Name;
+                filter.Value = ((ConstantExpression) node.Right).Value;
+                _filters.Add(filter);
+                return node;
+            }
         }
     }
 }
