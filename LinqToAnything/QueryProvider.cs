@@ -26,7 +26,7 @@ namespace LinqToAnything
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
             var queryVisitor = _queryVisitor ?? (_queryVisitor = new QueryVisitor());
-            queryVisitor.Process(expression);
+            queryVisitor.Visit(expression);
             if (typeof(TElement) != typeof(T))
             {
                 DataQuery<TElement> q = info => _dataQuery(info).Select(queryVisitor.Transform<T, TElement>());

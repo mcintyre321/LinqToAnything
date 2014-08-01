@@ -136,6 +136,16 @@ namespace LinqToAnything.Tests
             Assert.AreEqual("Item 07", items.ToArray().Single().Name);
         }
 
+        [Test]
+        public void CanHandleAnOrElseWhereClause()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var items = pq.Where(s => s.Name == "Item 07" || s.Name == "Item 08");
+            Assert.AreEqual("Item 07", items.ToArray().First().Name);
+            Assert.AreEqual("Item 08", items.ToArray().Skip(1).First().Name);
+        }
+
 
         [Test]
         public void CanHandleAnEndsWithMethodCallWhereClause()
@@ -197,15 +207,24 @@ namespace LinqToAnything.Tests
                 query = query.OrderBy(clause);
             }
 
-            foreach (var filter in qi.Wheres)
+            foreach (var clause in qi.Clauses)
             {
-                if (filter.Operator == "Contains" || filter.Operator == "EndsWith")
+                var where = clause as Where;
+                if (where != null)
                 {
-                    query = query.Where(filter.PropertyName + "." + filter.Operator + "(@0)", filter.Value);
+                    if (where.Operator == "Contains" || where.Operator == "EndsWith")
+                    {
+                        query = query.Where(where.PropertyName + "." + clause.Operator + "(@0)", where.Value);
+                    }
+                    if (clause.Operator == "Equal")
+                    {
+                        query = query.Where(where.PropertyName + " == @0", where.Value);
+                    }
                 }
-                if (filter.Operator == "op_Equality")
+                
+                if (clause.Operator == "OrElse")
                 {
-                    query = query.Where(filter.PropertyName + " == @0", filter.Value);
+                    query = query.Where((Expression<Func<SomeEntity, bool>>) ((Or)clause).Expression);
                 }
                 
             }
@@ -214,6 +233,7 @@ namespace LinqToAnything.Tests
             if (qi.Take != null) query = query.Take(qi.Take.Value);
             return query.ToArray();
         }
+
     }
 
     public class SomeEntityVm

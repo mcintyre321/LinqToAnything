@@ -9,18 +9,12 @@ namespace LinqToAnything
 {
     public class QueryVisitor : System.Linq.Expressions.ExpressionVisitor, QueryInfo
     {
-        private List<Where> _filters = new List<Where>();
+        private List<Clause> _filters = new List<Clause>();
         public int? Take { get; set; }
         public int Skip { get; set; }
         public OrderBy OrderBy { get; set; }
 
-        public IEnumerable<Where> Wheres { get { return _filters.AsReadOnly(); } }
-
-        public void Process(Expression expression)
-        {
-            Visit(expression);
-            return;
-        }
+        public IEnumerable<Clause> Clauses { get { return _filters.AsReadOnly(); } }
 
         // override ExpressionVisitor method
         protected override Expression VisitMethodCall(MethodCallExpression m)
