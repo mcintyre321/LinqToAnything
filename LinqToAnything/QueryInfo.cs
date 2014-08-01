@@ -44,13 +44,13 @@ namespace LinqToAnything
     public class Or : Clause
     {
         public IEnumerable<Clause> Clauses { get; internal set; }
-        public Expression Expression { get; set; }
 
         public override Clause Clone()
         {
             return new Or()
             {
                 Operator = this.Operator,
+                Expression = Expression,
                 Clauses = this.Clauses.Select(c => c.Clone())
             };
         }
@@ -65,7 +65,6 @@ namespace LinqToAnything
         /// </summary>
         public object Value { get; internal set; }
 
-        public Expression Expression { get; internal set; }
 
         public override Clause Clone()
         {
@@ -73,6 +72,7 @@ namespace LinqToAnything
             {
                 Operator = this.Operator,
                 PropertyName = this.PropertyName,
+                Expression = Expression,
                 Value = this.Value
             };
         }
@@ -81,6 +81,7 @@ namespace LinqToAnything
     public abstract class Clause
     {
         public string Operator { get; internal set; }
+        public Expression Expression { get; internal set; }
         public abstract Clause Clone();
     }
 

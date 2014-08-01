@@ -231,7 +231,19 @@ namespace LinqToAnything.Tests
             Assert.AreEqual(10, itemCount);
         }
 
-
+        [Test, Ignore("Not implemented")]
+        public void CanHandleAProjectionAndACountAgainstLambdaProvider()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => LambdaDataSource(info);
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var someEntities = pq;
+            var projection = someEntities
+                .Select(s => new Projection { Item = s.Name })
+                .Where(i => i.Item.Contains("07"));
+            ;
+            var itemCount = projection.Count();
+            Assert.AreEqual(1, itemCount);
+        }
 
 
         [Test]
@@ -288,6 +300,28 @@ namespace LinqToAnything.Tests
             return query.ToArray();
         }
 
+        static IEnumerable<SomeEntity> LambdaDataSource(QueryInfo qi)
+        {
+            Skipped = qi.Skip;
+            Taken = qi.Take;
+            var query = Data.AsQueryable();
+            if (qi.OrderBy != null)
+            {
+                var clause = qi.OrderBy.Name;
+                if (qi.OrderBy.Direction == OrderBy.OrderByDirection.Desc) clause += " descending";
+                query = query.OrderBy(clause);
+            }
+
+            foreach (var clause in qi.Clauses)
+            {
+                query = query.Where((Expression<Func<SomeEntity, bool>>) clause.Expression);
+
+            }
+
+            query = query.Skip(qi.Skip);
+            if (qi.Take != null) query = query.Take(qi.Take.Value);
+            return query.ToArray();
+        }
 
         static IEnumerable<SomeEntity> IncompleteDataSource(QueryInfo qi)
         { 

@@ -10,12 +10,14 @@ namespace LinqToAnything
         public IEnumerable<Clause> Filters { get { return _filters.AsReadOnly(); } }
 
         private Expression lambdaExpression;
+        private dynamic parameter;
 
         public override Expression Visit(Expression node)
         {
             if (lambdaExpression == null)
             {
                 lambdaExpression = node;
+                parameter = ((dynamic)lambdaExpression).Operand.Parameters[0];
             }
             return base.Visit(node);
         }
@@ -25,6 +27,7 @@ namespace LinqToAnything
             var filter = new Where();
             var memberExpression = ((System.Linq.Expressions.MemberExpression) node.Object);
             filter.PropertyName = memberExpression.Member.Name;
+            filter.Expression = Expression.Lambda(node, parameter);
             filter.Operator = node.Method.Name;
             filter.Value = node.Arguments[0];
             _filters.Add(filter);
@@ -36,13 +39,13 @@ namespace LinqToAnything
         {
             if (node.NodeType == ExpressionType.AndAlso)
             {
-                this.VisitBinary((BinaryExpression) node.Left);
-                this.VisitBinary((BinaryExpression) node.Right);
+                this.Visit((BinaryExpression) node.Left);
+                this.Visit((BinaryExpression) node.Right);
                 return node;
             }
             else if (node.NodeType == ExpressionType.OrElse)
             {
-                var parameter = ((dynamic) lambdaExpression).Operand.Parameters[0];
+                
                 var filter = new Or {Operator = node.NodeType.ToString()};
                 
                 var whereVisitor = new WhereClauseVisitor();
@@ -73,11 +76,12 @@ namespace LinqToAnything
                 {
                     filter.PropertyName = member.Member.Name;
                 }
+                filter.Expression = Expression.Lambda(node, parameter);
                 filter.Operator = node.NodeType.ToString();
                 filter.Value = ((ConstantExpression) node.Right).Value;
                 _filters.Add(filter);
                 return node;
+    }
             }
         }
-    }
 }
