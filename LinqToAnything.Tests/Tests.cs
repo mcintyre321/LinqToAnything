@@ -12,7 +12,7 @@ namespace LinqToAnything.Tests
     {
         private static int Skipped;
         private static int? Taken;
-        private static IEnumerable<SomeEntity> Data = Enumerable.Range(1, 10).Select(i => new SomeEntity { Name = "Item " + i.ToString().PadLeft(2, '0') });
+        private static IEnumerable<SomeEntity> Data = Enumerable.Range(1, 10).Select(i => new SomeEntity { Index = i, Name = "Item " + i.ToString().PadLeft(2, '0') });
 
         [Test]
         public void CanSkipAndTake()
@@ -41,6 +41,19 @@ namespace LinqToAnything.Tests
 
             Assert.AreEqual(1, count);
         }
+
+        [Test]
+        public void CanDoACountWithANullComparison()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var items = pq.Where(s => s.Name != null);
+            var count = items.Count();
+
+            Assert.AreEqual(10, count);
+        }
+
 
         [Test]
         public void CanDoACountWithNoIllEffect()
@@ -126,6 +139,17 @@ namespace LinqToAnything.Tests
             var items = pq.Where(s => s.Name == "Item 07");
             Assert.AreEqual("Item 07", items.ToArray().Single().Name);
         }
+
+        [Test]
+        public void CanHandleAnOperatorWhereClauseOnAValueType()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var items = pq.Where(s => s.Index != null && s.Index == 7);
+            Assert.AreEqual("Item 07", items.ToArray().Single().Name);
+        }
+
+
 
         [Test]
         public void CanHandleAnAndAlsoWhereClause()
@@ -244,6 +268,7 @@ namespace LinqToAnything.Tests
     public   class SomeEntity
     {
         public string Name { get; set; }
+        public int Index { get; set; }
     }
 
     public class Projection

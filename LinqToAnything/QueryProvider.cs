@@ -62,7 +62,7 @@ namespace LinqToAnything
         }
     }
 
-    public class SwitchoutVisitor<T> : ExpressionVisitor
+    internal class SwitchoutVisitor<T> : ExpressionVisitor
     {
         private readonly object data;
 
@@ -71,14 +71,10 @@ namespace LinqToAnything
             this.data = data;
         }
 
-        public override Expression Visit(Expression node)
-        {
-            return base.Visit(node);
-        }
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (node.Value.GetType() == typeof (T))
+            if (node.Value != null && node.Value.GetType() == typeof (T))
             {
                 return Expression.Constant(data);
             }

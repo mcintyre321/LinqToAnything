@@ -44,9 +44,12 @@ namespace LinqToAnything
             {
                 var parameter = ((dynamic) lambdaExpression).Operand.Parameters[0];
                 var filter = new Or {Operator = node.NodeType.ToString()};
+                
                 var whereVisitor = new WhereClauseVisitor();
-                whereVisitor.VisitBinary((BinaryExpression)node.Left);
-                whereVisitor.VisitBinary((BinaryExpression) node.Right);
+                whereVisitor.lambdaExpression = this.lambdaExpression;
+
+                whereVisitor.Visit(node.Left);
+                whereVisitor.Visit(node.Right);
                 filter.Clauses = whereVisitor.Filters;
                 filter.Expression = Expression.Lambda(node, parameter);
                 _filters.Add(filter);
@@ -55,7 +58,21 @@ namespace LinqToAnything
             else
             {
                 var filter = new Where();
-                filter.PropertyName = ((MemberExpression) node.Left).Member.Name;
+                var member = node.Left as MemberExpression;
+                
+                if (member == null)
+                {
+                    var unaryMember = node.Left as UnaryExpression;
+                    if (unaryMember != null)
+                    {
+                        member = unaryMember.Operand as MemberExpression;
+                    }
+                }
+
+                if (member != null)
+                {
+                    filter.PropertyName = member.Member.Name;
+                }
                 filter.Operator = node.NodeType.ToString();
                 filter.Value = ((ConstantExpression) node.Right).Value;
                 _filters.Add(filter);
