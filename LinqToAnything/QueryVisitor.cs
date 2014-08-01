@@ -7,14 +7,16 @@ using System.Runtime.InteropServices.ComTypes;
 
 namespace LinqToAnything
 {
-    public class QueryVisitor : System.Linq.Expressions.ExpressionVisitor, QueryInfo
+    
+    public class QueryVisitor : System.Linq.Expressions.ExpressionVisitor
     {
-        private List<Clause> _filters = new List<Clause>();
-        public int? Take { get; set; }
-        public int Skip { get; set; }
-        public OrderBy OrderBy { get; set; }
+        public QueryInfo QueryInfo { get; private set; }
 
-        public IEnumerable<Clause> Clauses { get { return _filters.AsReadOnly(); } }
+
+        public QueryVisitor(QueryInfo queryInfo = null)
+        {
+            this.QueryInfo = queryInfo ?? new QueryInfo();
+        }
 
         // override ExpressionVisitor method
         protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -27,7 +29,7 @@ namespace LinqToAnything
 
                     var countExpression = (ConstantExpression)(m.Arguments[1]);
 
-                    Skip = ((int)countExpression.Value);
+                    QueryInfo.Skip = ((int)countExpression.Value);
                     return m;
                 }
                 else if (m.Method.Name.Equals("Take"))
@@ -36,7 +38,7 @@ namespace LinqToAnything
 
                     var countExpression = (ConstantExpression)(m.Arguments[1]);
 
-                    Take = ((int)countExpression.Value);
+                    QueryInfo.Take = ((int)countExpression.Value);
                     return m;
                 } else if(m.Method.Name.Equals("Select"))
                 {
@@ -55,7 +57,7 @@ namespace LinqToAnything
                     MethodCallExpression call = m;
                     var lambda = (LambdaExpression)ExpressionUtils.RemoveQuotes(call.Arguments[1]);
                     var lambdaBody = (MemberExpression) ExpressionUtils.RemoveQuotes(lambda.Body);
-                    OrderBy = new OrderBy(lambdaBody.Member.Name, OrderBy.OrderByDirection.Desc);
+                    QueryInfo.OrderBy = new OrderBy(lambdaBody.Member.Name, OrderBy.OrderByDirection.Desc);
                 }
                 else if (m.Method.Name.Equals("Where"))
                 {
@@ -63,7 +65,7 @@ namespace LinqToAnything
                     var whereClause = call.Arguments[1];
                     var whereClauseVisitor = new WhereClauseVisitor();
                     whereClauseVisitor.Visit(whereClause);
-                    _filters.AddRange(whereClauseVisitor.Filters);
+                    QueryInfo.Clauses = QueryInfo.Clauses.Concat((whereClauseVisitor.Filters)).ToArray();
                 }
             }
 
@@ -79,20 +81,4 @@ namespace LinqToAnything
         }
     }
 
-    public class OrderBy
-    {
-        public OrderBy(string name, OrderByDirection direction)
-        {
-            Name = name;
-            Direction = direction;
-        }
-
-        public enum OrderByDirection
-        {
-            Asc,Desc
-        }
-        public string Name { get; private set; }
-        public OrderByDirection Direction { get; private set; }
-
-    }
 }

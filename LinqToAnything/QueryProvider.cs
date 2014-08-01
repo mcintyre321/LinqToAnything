@@ -25,22 +25,22 @@ namespace LinqToAnything
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
-            var queryVisitor = _queryVisitor ?? (_queryVisitor = new QueryVisitor());
+            var queryVisitor = new QueryVisitor(_queryVisitor.QueryInfo.Clone());
             queryVisitor.Visit(expression);
             if (typeof(TElement) != typeof(T))
             {
                 DataQuery<TElement> q = info => _dataQuery(info).Select(queryVisitor.Transform<T, TElement>());
-                return new DelegateQueryable<TElement>(q, null, _queryVisitor);
+                return new DelegateQueryable<TElement>(q, null, queryVisitor);
             }
-            return new DelegateQueryable<TElement>((DataQuery<TElement>) ((object)_dataQuery), expression, _queryVisitor);
+            return new DelegateQueryable<TElement>((DataQuery<TElement>)((object)_dataQuery), expression, queryVisitor);
  
         }
 
 
         public IEnumerable<TResult> GetEnumerable<TResult>()
         {
-            var queryVisitor = _queryVisitor ?? new QueryVisitor();
-            var results = _dataQuery(queryVisitor);
+            var queryVisitor = _queryVisitor ?? (_queryVisitor = new QueryVisitor());
+            var results = _dataQuery(queryVisitor.QueryInfo);
             //if (queryVisitor.Select != null)
             //{
             //    var projectionFunc = (Func<T, TResult>)queryVisitor.Select.Lambda.Compile();
@@ -56,9 +56,28 @@ namespace LinqToAnything
 
         public TResult Execute<TResult>(Expression expression)
         {
-            var data =  _dataQuery(new QueryVisitor()).ToArray().AsQueryable();
-            data = data.InterceptWith(new SwitchoutVisitor<DelegateQueryable<T>>(data));
-            return (TResult) data.Provider.Execute(expression);
+            var methodCallExpression = (MethodCallExpression)expression;
+            var queryVisitor = new QueryVisitor(_queryVisitor.QueryInfo.Clone());
+            var array = _dataQuery(queryVisitor.QueryInfo).ToList();
+            var data = array.AsQueryable();
+
+            var newExp = Expression.Call(methodCallExpression.Method, Expression.Constant(data));
+            return data.Provider.Execute<TResult>(newExp);
+        }
+    }
+
+    public class SwitchoutArgumentVisitor : ExpressionVisitor
+    {
+        private readonly object arg;
+
+        public SwitchoutArgumentVisitor(object arg)
+        {
+            this.arg = arg;
+        }
+
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            return Expression.Constant(arg);
         }
     }
 
@@ -72,9 +91,14 @@ namespace LinqToAnything
         }
 
 
+        public override Expression Visit(Expression node)
+        {
+            return base.Visit(node);
+        }
+
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (node.Value != null && node.Value.GetType() == typeof (T))
+            if (node.Value != null && node.Value is T)
             {
                 return Expression.Constant(data);
             }

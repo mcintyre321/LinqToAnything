@@ -203,6 +203,36 @@ namespace LinqToAnything.Tests
             Assert.AreEqual("Item 02", items.ToArray().First().Item);
         }
 
+        [Test]
+        public void CanHandleAProjectionAndACount()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var someEntities = pq
+                .Where(i => i.Name.Contains("07"));
+            var projection = someEntities
+                .Select(s => new SomeEntityVm() { Name = s.Name })
+                .Where(p => p.Name == "Item 07");
+            var itemCount = projection.Count();
+            Assert.AreEqual(1, itemCount);
+        }
+
+
+        [Test]
+        public void CanHandleAProjectionAndACountAgainstIncompleteProvider()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => IncompleteDataSource(info);
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var someEntities = pq
+                .Where(i => i.Name.Contains("07"));
+            var projection = someEntities
+                .Select(s => new Projection { Item = s.Name });
+            var itemCount = projection.Count();
+            Assert.AreEqual(10, itemCount);
+        }
+
+
+
 
         [Test]
         public void CanHandleAProjectionASkipAndAnOrderByDesc()
@@ -255,6 +285,13 @@ namespace LinqToAnything.Tests
 
             query = query.Skip(qi.Skip);
             if (qi.Take != null) query = query.Take(qi.Take.Value);
+            return query.ToArray();
+        }
+
+
+        static IEnumerable<SomeEntity> IncompleteDataSource(QueryInfo qi)
+        { 
+            var query = Data.AsQueryable();
             return query.ToArray();
         }
 
