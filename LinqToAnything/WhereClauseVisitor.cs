@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -7,7 +8,11 @@ namespace LinqToAnything
     public class WhereClauseVisitor : ExpressionVisitor
     {
         private List<Clause> _filters = new List<Clause>();
-        public IEnumerable<Clause> Filters { get { return _filters.AsReadOnly(); } }
+
+        public IEnumerable<Clause> Filters
+        {
+            get { return _filters.AsReadOnly(); }
+        }
 
         private Expression lambdaExpression;
         private dynamic parameter;
@@ -17,7 +22,7 @@ namespace LinqToAnything
             if (lambdaExpression == null)
             {
                 lambdaExpression = node;
-                parameter = ((dynamic)lambdaExpression).Operand.Parameters[0];
+                parameter = ((dynamic) lambdaExpression).Operand.Parameters[0];
             }
             return base.Visit(node);
         }
@@ -45,9 +50,9 @@ namespace LinqToAnything
             }
             else if (node.NodeType == ExpressionType.OrElse)
             {
-                
+
                 var filter = new Or {Operator = node.NodeType.ToString()};
-                
+
                 var whereVisitor = new WhereClauseVisitor();
                 whereVisitor.lambdaExpression = this.lambdaExpression;
 
@@ -62,7 +67,7 @@ namespace LinqToAnything
             {
                 var filter = new Where();
                 var member = node.Left as MemberExpression;
-                
+
                 if (member == null)
                 {
                     var unaryMember = node.Left as UnaryExpression;
@@ -78,10 +83,35 @@ namespace LinqToAnything
                 }
                 filter.Expression = Expression.Lambda(node, parameter);
                 filter.Operator = node.NodeType.ToString();
-                filter.Value = ((ConstantExpression) node.Right).Value;
+                filter.Value = GetValueFromExpression(node.Right);
                 _filters.Add(filter);
                 return node;
-    }
             }
         }
+        private static object GetValueFromExpression(Expression node)
+        {
+            var member = node as MemberExpression;
+
+            if (member == null)
+            {
+                var unaryMember = node as UnaryExpression;
+                if (unaryMember != null)
+                {
+                    member = unaryMember.Operand as MemberExpression;
+                }
+            }
+
+            if (member != null)
+            {
+                return Expression.Lambda(member).Compile().DynamicInvoke();
+            }
+
+            var constant = node as ConstantExpression;
+            if (constant != null)
+            {
+                return constant.Value;
+            }
+            throw new NotImplementedException();
+        }
+    }
 }

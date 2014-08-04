@@ -140,6 +140,18 @@ namespace LinqToAnything.Tests
             Assert.AreEqual("Item 07", items.ToArray().Single().Name);
         }
 
+
+        [Test]
+        public void CanHandleAnOperatorWhereClauseAgainstAVariable()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var variable = "Item 07";
+            var items = pq.Where(s => s.Name == variable);
+            Assert.AreEqual("Item 07", items.ToArray().Single().Name);
+        }
+
+
         [Test]
         public void CanHandleAnOperatorWhereClauseOnAValueType()
         {
@@ -258,6 +270,20 @@ namespace LinqToAnything.Tests
 
             Assert.AreEqual("Item 09", items.ToArray().First().Item);
         }
+
+        [Test]
+        public void CanHandleAProjectionASkipAndAnOrderByAsc()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) =>
+            {
+                Assert.AreEqual(OrderBy.OrderByDirection.Asc, info.OrderBy.Direction);
+                return Enumerable.Empty<SomeEntity>();
+            };
+            var pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            pq.OrderBy(e => e.Name).ToArray();
+        }
+
+
 
 
         // this method could call a sproc, or a webservice etc.

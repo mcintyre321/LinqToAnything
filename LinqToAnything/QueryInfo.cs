@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Mail;
 
 namespace LinqToAnything
 {
@@ -19,6 +20,8 @@ namespace LinqToAnything
 
     public class QueryInfo
     {
+
+
         public QueryInfo()
         {
             Clauses = Enumerable.Empty<Clause>();
@@ -38,6 +41,7 @@ namespace LinqToAnything
                 Clauses = this.Clauses.Select(c => c.Clone()).ToList()
             };
         }
+         
     }
 
 
@@ -53,6 +57,11 @@ namespace LinqToAnything
                 Expression = Expression,
                 Clauses = this.Clauses.Select(c => c.Clone())
             };
+        }
+
+        public override string ToString()
+        {
+            return "(" + string.Join(") or ( ", Clauses.Select(c => c.ToString())) + ")";
         }
     }
 
@@ -75,6 +84,11 @@ namespace LinqToAnything
                 Expression = Expression,
                 Value = this.Value
             };
+        }
+
+        public override string ToString()
+        {
+            return "where " + PropertyName + " " + Operator + " " + Value.ToString();
         }
     }
 
@@ -105,6 +119,23 @@ namespace LinqToAnything
         public OrderBy Clone()
         {
             return new OrderBy(this.Name, this.Direction);
+        }
+
+        public override string ToString()
+        {
+            return "order by " + Name + " " + this.Direction.ToString().ToUpper();
+        }
+    }
+
+    public static class QueryInfoExtension
+    {
+        public static T GetWhereClauseValue<T>(this QueryInfo qi, string propertyName, string @operator)
+        {
+            return qi.Clauses.OfType<Where>()
+                .Where(c => c.PropertyName == propertyName && c.Operator == @operator)
+                .Select(c => c.Value)
+                .OfType<T>()
+                .SingleOrDefault();
         }
     }
 }
