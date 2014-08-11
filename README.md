@@ -28,3 +28,15 @@ Please see [QueryInfo.cs](https://github.com/mcintyre321/LinqToAnything/blob/mas
 
 Skip, Take, Orderby and simple Where clauses are supported (enough to do Datatables)
 
+Heres an example of something you can do with this
+
+```
+
+    IQuerable<WADLogsTableRow> rows = wadLogsTableContenxt
+       .ToQueryable() //make azure table storage into an IQueryable, where Timestamp queries are done on partitionkey, the rest in memory
+       .ToCachedQueryable(CacheByTimestampIfDateRangeIsInThePast)
+       .ToChunkedQueryable(ChunkByTimestampIntoHours);
+
+```
+
+It makes it easy to disassemble and reconstruct Linq queries, so you can do custom stuff to them.
