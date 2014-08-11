@@ -39,7 +39,7 @@ namespace LinqToAnything
 
         public IEnumerable<TResult> GetEnumerable<TResult>()
         {
-            var queryVisitor = _queryVisitor ?? (_queryVisitor = new QueryVisitor());
+            var queryVisitor = new QueryVisitor(_queryVisitor.QueryInfo.Clone());
             var results = _dataQuery(queryVisitor.QueryInfo);
             //if (queryVisitor.Select != null)
             //{
@@ -58,6 +58,7 @@ namespace LinqToAnything
         {
             var methodCallExpression = (MethodCallExpression)expression;
             var queryVisitor = new QueryVisitor(_queryVisitor.QueryInfo.Clone());
+            queryVisitor.Visit(expression);
             var array = _dataQuery(queryVisitor.QueryInfo).ToList();
             var data = array.AsQueryable();
 

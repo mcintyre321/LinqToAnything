@@ -150,6 +150,17 @@ namespace LinqToAnything.Tests
             var items = pq.Where(s => s.Name == variable);
             Assert.AreEqual("Item 07", items.ToArray().Single().Name);
         }
+        [Test]
+        public void CanHandleASecondWhereClauseAfterACount()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
+            IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            var items = pq.Where(s => s.Name == "Item 07");
+            var count = items.Count();
+            var items2 = items.Where(s => s.Name != "Item 07");
+            Assert.AreEqual(0, items2.ToArray().Length);
+            
+        }
 
 
         [Test]
@@ -157,7 +168,7 @@ namespace LinqToAnything.Tests
         {
             DataQuery<SomeEntity> getPageFromDataSource = (info) => SomeDataSource(info);
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
-            var items = pq.Where(s => s.Index != null && s.Index == 7);
+            var items = pq.Where(s => s.Index != 0 && s.Index == 7);
             Assert.AreEqual("Item 07", items.ToArray().Single().Name);
         }
 
@@ -312,6 +323,13 @@ namespace LinqToAnything.Tests
                     {
                         query = query.Where(where.PropertyName + " == @0", where.Value);
                     }
+
+                    if (clause.Operator == "NotEqual")
+                    {
+                        query = query.Where(where.PropertyName + " != @0", where.Value);
+                    }
+
+
                 }
                 
                 if (clause.Operator == "OrElse")
