@@ -9,13 +9,15 @@ namespace LinqToAnything
     public class QueryProvider<T> : IQueryProvider
     {
         private readonly DataQuery<T> _dataQuery;
+        private readonly CountQuery countQuery;
         private QueryVisitor _queryVisitor;
 
 
-        public QueryProvider(DataQuery<T> dataQuery, QueryVisitor _queryVisitor = null)
+        public QueryProvider(DataQuery<T> dataQuery, CountQuery countQuery, QueryVisitor queryVisitor = null)
         {
             _dataQuery = dataQuery;
-            this._queryVisitor = _queryVisitor ?? new QueryVisitor();
+            this.countQuery = countQuery;
+            this._queryVisitor = queryVisitor ?? new QueryVisitor();
         }
 
         public IQueryable CreateQuery(Expression expression)
@@ -30,9 +32,9 @@ namespace LinqToAnything
             if (typeof(TElement) != typeof(T))
             {
                 DataQuery<TElement> q = info => _dataQuery(info).Select(queryVisitor.Transform<T, TElement>());
-                return new DelegateQueryable<TElement>(q, null, queryVisitor);
+                return new DelegateQueryable<TElement>(q, countQuery, null, queryVisitor);
             }
-            return new DelegateQueryable<TElement>((DataQuery<TElement>)((object)_dataQuery), expression, queryVisitor);
+            return new DelegateQueryable<TElement>((DataQuery<TElement>)((object)_dataQuery), countQuery, expression, queryVisitor);
  
         }
 
@@ -41,9 +43,9 @@ namespace LinqToAnything
         {
             var queryVisitor = new QueryVisitor(_queryVisitor.QueryInfo.Clone());
             var results = _dataQuery(queryVisitor.QueryInfo);
-            //if (queryVisitor.Select != null)
+            //if (countQuery.Select != null)
             //{
-            //    var projectionFunc = (Func<T, TResult>)queryVisitor.Select.Lambda.Compile();
+            //    var projectionFunc = (Func<T, TResult>)countQuery.Select.Lambda.Compile();
             //    return results.Select(projectionFunc);
             //}
             return (IEnumerable<TResult>) results;
@@ -57,8 +59,14 @@ namespace LinqToAnything
         public TResult Execute<TResult>(Expression expression)
         {
             var methodCallExpression = (MethodCallExpression)expression;
+            
             var queryVisitor = new QueryVisitor(_queryVisitor.QueryInfo.Clone());
             queryVisitor.Visit(expression);
+            if (methodCallExpression.Method.Name == "Count" && typeof(TResult) == typeof(int))
+            {
+                return (TResult) (object) countQuery(queryVisitor.QueryInfo);
+            }
+
             var array = _dataQuery(queryVisitor.QueryInfo).ToList();
             var data = array.AsQueryable();
 

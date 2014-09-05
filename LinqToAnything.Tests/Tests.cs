@@ -293,6 +293,16 @@ namespace LinqToAnything.Tests
             var pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             pq.OrderBy(e => e.Name).ToArray();
         }
+        [Test]
+        public void CanDoAnOptimizedCount()
+        {
+            DataQuery<SomeEntity> getPageFromDataSource = (info) =>
+            {
+                throw new NotImplementedException();
+            };
+            var pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource, qi => 15);
+            Assert.AreEqual(15, pq.Count(x => x.Index > 1));
+        }
 
 
 
