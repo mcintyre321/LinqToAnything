@@ -303,9 +303,23 @@ namespace LinqToAnything.Tests
             var pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource, qi => 15);
             Assert.AreEqual(15, pq.Count(x => x.Index > 1));
         }
+        [Test]
+        public void CanApplyAQueryInfo()
+        {
+            var queryable = Enumerable.Range(1, 100).Select(i => new SomeEntity() { Name = "User" + i, Index = i }).ToArray().AsQueryable();
+
+
+            DataQuery<SomeEntity> getPageFromDataSource = (info) =>
+            {
+                return info.ApplyTo(queryable);
+            };
+            var pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            Assert.AreEqual(90, pq.OrderByDescending(o => o.Index).Skip(10).Take(1).Single().Index);
+        }
 
 
 
+        
 
         // this method could call a sproc, or a webservice etc.
         static IEnumerable<SomeEntity> SomeDataSource(QueryInfo qi)

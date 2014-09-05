@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Mail;
@@ -52,7 +53,10 @@ namespace LinqToAnything
             }
             if (qi.OrderBy != null)
             {
-                q = q.OrderBy(qi.OrderBy.ToString());
+                var orderBy = qi.OrderBy.Name;
+                if (this.OrderBy.Direction == OrderBy.OrderByDirection.Desc)
+                    orderBy += " descending";
+                q = q.OrderBy(orderBy);
             }
 
             if (qi.Skip > 0) q = q.Skip(qi.Skip);
