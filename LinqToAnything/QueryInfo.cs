@@ -26,10 +26,10 @@ namespace LinqToAnything
         {
             Clauses = Enumerable.Empty<Clause>();
         }
-        public int? Take { get; internal set; } //10
-        public int Skip { get; internal set; } //20
-        public OrderBy OrderBy { get; internal set; } //LinqToAnything.OrderBy.Asc
-        public IEnumerable<Clause> Clauses { get; internal set; } // an array containing two where objects
+        public int? Take { get; set; } //10
+        public int Skip { get; set; } //20
+        public OrderBy OrderBy { get; set; } //LinqToAnything.OrderBy.Asc
+        public IEnumerable<Clause> Clauses { get; set; } // an array containing two where objects
 
         public QueryInfo Clone()
         {
@@ -47,7 +47,7 @@ namespace LinqToAnything
 
     public class Or : Clause
     {
-        public IEnumerable<Clause> Clauses { get; internal set; }
+        public IEnumerable<Clause> Clauses { get; set; }
 
         public override Clause Clone()
         {
@@ -67,12 +67,12 @@ namespace LinqToAnything
 
     public class Where : Clause
     {
-        public string PropertyName { get; internal set; }
+        public string PropertyName { get; set; }
 
         /// <summary>
         /// either a method name (e.g. Contains, StartsWith) or an operator name (op_Inequality,op_GreaterThan,op_GreaterThanOrEqual,op_LessThan,op_LessThanOrEqual,op_Multiply,op_Subtraction,op_Addition,op_Division,op_Modulus,op_BitwiseAnd,op_BitwiseOr,op_ExclusiveOr)
         /// </summary>
-        public object Value { get; internal set; }
+        public object Value { get; set; }
 
 
         public override Clause Clone()
@@ -94,8 +94,8 @@ namespace LinqToAnything
 
     public abstract class Clause
     {
-        public string Operator { get; internal set; }
-        public Expression Expression { get; internal set; }
+        public string Operator { get; set; }
+        public Expression Expression { get; set; }
         public abstract Clause Clone();
     }
 
@@ -113,8 +113,8 @@ namespace LinqToAnything
             Desc
         }
 
-        public string Name { get; internal set; }
-        public OrderByDirection Direction { get; internal set; }
+        public string Name { get; set; }
+        public OrderByDirection Direction { get; set; }
 
         public OrderBy Clone()
         {
