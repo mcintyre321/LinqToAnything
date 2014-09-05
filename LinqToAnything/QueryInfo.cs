@@ -1,9 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Mail;
-
+using System.Linq.Dynamic;
 namespace LinqToAnything
 {
     /// <summary>
@@ -41,7 +42,27 @@ namespace LinqToAnything
                 Clauses = this.Clauses.Select(c => c.Clone()).ToList()
             };
         }
-         
+
+        public IQueryable<T> ApplyTo<T>(IQueryable<T> q)
+        {
+            var qi = this;
+            foreach (var clause in qi.Clauses)
+            {
+                q = q.Where((Expression<Func<T, bool>>)clause.Expression);
+            }
+            if (qi.OrderBy != null)
+            {
+                q = q.OrderBy(qi.OrderBy.ToString());
+            }
+
+            if (qi.Skip > 0) q = q.Skip(qi.Skip);
+
+            if (qi.Take != null) q = q.Take(qi.Take.Value);
+
+
+
+            return q;
+        }
     }
 
 
