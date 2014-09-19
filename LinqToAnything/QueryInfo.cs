@@ -84,6 +84,11 @@ namespace LinqToAnything
             };
         }
 
+        public override IEnumerable<string> PropertyNames
+        {
+            get { return Clauses.SelectMany(c => c.PropertyNames); }
+        }
+
         public override string ToString()
         {
             return "(" + string.Join(") or ( ", Clauses.Select(c => c.ToString())) + ")";
@@ -111,6 +116,11 @@ namespace LinqToAnything
             };
         }
 
+        public override IEnumerable<string> PropertyNames
+        {
+            get { return new[] {PropertyName}; }
+        }
+
         public override string ToString()
         {
             return "where " + PropertyName + " " + Operator + " " + Value.ToString();
@@ -122,7 +132,9 @@ namespace LinqToAnything
         public string Operator { get; set; }
         public Expression Expression { get; set; }
         public abstract Clause Clone();
+        public abstract IEnumerable<String> PropertyNames { get;}
     }
+    
 
     public class OrderBy
     {
