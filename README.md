@@ -13,13 +13,16 @@ Take one paged data access method:
 public void IEnumerable<Product> GetProducts(int pageIndex, int pageSize);
 ```
 
-Wrap it as a [DataQuery](https://github.com/mcintyre321/LinqToAnything/blob/master/LinqToAnything/DataQuery.cs) delegate:
+Wrap it as a `Func<QueryInfo, IEnumerable<T>>` delegate
+
 
 ```
+
 DataQuery<Product> dataQuery = queryInfo => GetProducts(queryInfo.Take / queryInfo.Skip, queryInfo.Skip);
                                                          //notice that we have mapped Skip and Take into paging parameters
 
 IQuerable<Product> queryable = new DelegateQueryable<string>(dataQuery)
+
 ```
 
 Basically, the queryInfo object provides a simplified view of the expression tree which you can then map to your data source.
@@ -27,16 +30,5 @@ Basically, the queryInfo object provides a simplified view of the expression tre
 Please see [QueryInfo.cs](https://github.com/mcintyre321/LinqToAnything/blob/master/LinqToAnything/QueryInfo.cs) for info on what queries are supported, and what operators you can use.
 
 Skip, Take, Orderby and simple Where clauses are supported (enough to do Datatables)
-
-Heres an example of something you can do with this
-
-```
-
-    IQuerable<WADLogsTableRow> rows = wadLogsTableContenxt
-       .ToQueryable() //make azure table storage into an IQueryable, where Timestamp queries are done on partitionkey, the rest in memory
-       .ToCachedQueryable(CacheByTimestampIfDateRangeIsInThePast)
-       .ToChunkedQueryable(ChunkByTimestampIntoHours);
-
-```
-
+     
 It makes it easy to disassemble and reconstruct Linq queries, so you can do custom stuff to them.
