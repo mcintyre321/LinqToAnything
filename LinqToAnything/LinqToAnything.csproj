@@ -54,7 +54,6 @@
     <Compile Include="ExpressionUtils.cs" />
     <Compile Include="QueryInfo.cs" />
     <Compile Include="DelegateQueryable.cs" />
-    <Compile Include="DataQuery.cs" />
     <Compile Include="QueryProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryVisitor.cs" />

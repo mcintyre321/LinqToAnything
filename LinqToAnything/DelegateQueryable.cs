@@ -11,14 +11,14 @@ namespace LinqToAnything
         QueryProvider<T> provider;
         Expression expression;
 
-        public DelegateQueryable(DataQuery<T> dataQuery, CountQuery countQuery = null)
+        public DelegateQueryable(Func<QueryInfo, IEnumerable<T>> dataQuery, Func<QueryInfo, int> countQuery = null)
         {
         
             this.provider = new QueryProvider<T>(dataQuery, countQuery ?? (qi => dataQuery(qi).Count()));
             this.expression = Expression.Constant(this);
         }
 
-        internal DelegateQueryable(DataQuery<T> dataQuery, CountQuery countQuery, Expression expression, QueryVisitor ev)
+        internal DelegateQueryable(Func<QueryInfo, IEnumerable<T>> dataQuery, Func<QueryInfo, int> countQuery, Expression expression, QueryVisitor ev)
         {
             
             this.provider = new QueryProvider<T>(dataQuery, countQuery, ev);

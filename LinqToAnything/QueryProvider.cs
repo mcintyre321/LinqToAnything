@@ -8,12 +8,12 @@ namespace LinqToAnything
 {
     public class QueryProvider<T> : IQueryProvider
     {
-        private readonly DataQuery<T> _dataQuery;
-        private readonly CountQuery countQuery;
+        private readonly Func<QueryInfo, IEnumerable<T>> _dataQuery;
+        private readonly Func<QueryInfo, int> countQuery;
         private QueryVisitor _queryVisitor;
 
 
-        public QueryProvider(DataQuery<T> dataQuery, CountQuery countQuery, QueryVisitor queryVisitor = null)
+        public QueryProvider(Func<QueryInfo, IEnumerable<T>> dataQuery, Func<QueryInfo, int> countQuery, QueryVisitor queryVisitor = null)
         {
             _dataQuery = dataQuery;
             this.countQuery = countQuery;
@@ -31,10 +31,10 @@ namespace LinqToAnything
             queryVisitor.Visit(expression);
             if (typeof(TElement) != typeof(T))
             {
-                DataQuery<TElement> q = info => _dataQuery(info).Select(queryVisitor.Transform<T, TElement>());
+                Func<QueryInfo, IEnumerable<TElement>> q = info => _dataQuery(info).Select(queryVisitor.Transform<T, TElement>());
                 return new DelegateQueryable<TElement>(q, countQuery, null, queryVisitor);
             }
-            return new DelegateQueryable<TElement>((DataQuery<TElement>)((object)_dataQuery), countQuery, expression, queryVisitor);
+            return new DelegateQueryable<TElement>((Func<QueryInfo, IEnumerable<TElement>>)((object)_dataQuery), countQuery, expression, queryVisitor);
  
         }
 
