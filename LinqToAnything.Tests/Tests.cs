@@ -17,15 +17,17 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanSkipAndTake()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
 
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             
+            //When I skip and then take
             var items = pq.Skip(3).Take(2).ToArray();
 
+            //Then the correct items should be returned
             Assert.AreEqual(3, Skipped);
             Assert.AreEqual(2, Taken);
-
             Assert.AreEqual("Item 04,Item 05", string.Join(",", items.Select(i => i.Name)));
 
         }
@@ -33,19 +35,25 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanDoACountWithAFilter()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
-
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
+            
+            //When a Contains method is called for a specific item 
             var items = pq.Where(s => s.Name.Contains("07"));
-            var count = items.Count();
 
+            //Then the result should contain a single item
+            var count = items.Count();
             Assert.AreEqual(1, count);
+            //And the item should be that item
+            Assert.AreEqual("Item 07", items.Single().Name);
         }
 
         [Test]
         public void CanDoACountWithANullComparison()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
 
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var items = pq.Where(s => s.Name != null);
@@ -58,7 +66,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanDoACountWithNoIllEffect()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
 
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
 
@@ -70,7 +79,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanDoATakeWithNoIllEffectOnOtherQueries()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
 
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var somethingElse = pq.Take(5);
@@ -83,7 +93,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanDoASelectWithNoIllEffectOnOtherQueries()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
 
             var pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource).Select(e => new SomeEntityVm()
             {
@@ -100,7 +111,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanWorkWithoutQuery()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
 
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
 
@@ -116,7 +128,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleAProjection()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var items = pq.Select(s => new Projection() { Item = s.Name });
             Assert.AreEqual("Item 01", items.ToArray().First().Item);
@@ -125,7 +138,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleAMethodCallWhereClause()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var items = pq.Where(s => s.Name.Contains("07"));
             Assert.AreEqual("Item 07", items.ToArray().Single().Name);
@@ -134,7 +148,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleAnOperatorWhereClause()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var items = pq.Where(s => s.Name == "Item 07");
             Assert.AreEqual("Item 07", items.ToArray().Single().Name);
@@ -144,7 +159,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleAnOperatorWhereClauseAgainstAVariable()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var variable = "Item 07";
             var items = pq.Where(s => s.Name == variable);
@@ -153,7 +169,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleASecondWhereClauseAfterACount()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var items = pq.Where(s => s.Name == "Item 07");
             var count = items.Count();
@@ -166,7 +183,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleAnOperatorWhereClauseOnAValueType()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var items = pq.Where(s => s.Index != 0 && s.Index == 7);
             Assert.AreEqual("Item 07", items.ToArray().Single().Name);
@@ -177,7 +195,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleAnAndAlsoWhereClause()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var items = pq.Where(s => s.Name == "Item 07" && s.Name == "Item 07");
             Assert.AreEqual("Item 07", items.ToArray().Single().Name);
@@ -186,7 +205,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleAnOrElseWhereClause()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var items = pq.Where(s => s.Name == "Item 07" || s.Name == "Item 08");
             Assert.AreEqual("Item 07", items.ToArray().First().Name);
@@ -197,7 +217,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleAnEndsWithMethodCallWhereClause()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var items = pq.Where(s => s.Name.EndsWith("07"));
             Assert.AreEqual("Item 07", items.ToArray().Single().Name);
@@ -206,7 +227,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleASkipATakeAndAProjection()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var items = pq.Skip(1).Take(1).Select(s => new Projection { Item = s.Name }).ToArray();
             Assert.AreEqual(1, Skipped);
@@ -217,7 +239,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleAProjectionASkipAndATake()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var items = pq.Skip(1).Take(1).Select(s => new Projection { Item = s.Name }).ToArray();
             Assert.AreEqual(1, Skipped);
@@ -229,7 +252,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleAProjectionAndACount()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var someEntities = pq
                 .Where(i => i.Name.Contains("07"));
@@ -244,6 +268,7 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleAProjectionAndACountAgainstIncompleteProvider()
         {
+            //Given an IQueryable made against a simple datasource
             Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => IncompleteDataSource(info);
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var someEntities = pq
@@ -257,6 +282,7 @@ namespace LinqToAnything.Tests
         [Test, Ignore("Not implemented")]
         public void CanHandleAProjectionAndACountAgainstLambdaProvider()
         {
+            //Given an IQueryable made against a simple datasource
             Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => LambdaDataSource(info);
             IQueryable<SomeEntity> pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var someEntities = pq;
@@ -272,7 +298,8 @@ namespace LinqToAnything.Tests
         [Test]
         public void CanHandleAProjectionASkipAndAnOrderByDesc()
         {
-            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = (info) => SomeDataSource(info);
+            //Given an IQueryable made against a simple datasource
+            Func<QueryInfo, IEnumerable<SomeEntity>> getPageFromDataSource = SomeDataAccessMethod;
             var pq = new DelegateQueryable<SomeEntity>(getPageFromDataSource);
             var items = pq.OrderByDescending(e => e.Name).Skip(1).Take(1)
                 .Select(s => new Projection { Item = s.Name }).ToArray();
@@ -322,7 +349,7 @@ namespace LinqToAnything.Tests
         
 
         // this method could call a sproc, or a webservice etc.
-        static IEnumerable<SomeEntity> SomeDataSource(QueryInfo qi)
+        static IEnumerable<SomeEntity> SomeDataAccessMethod(QueryInfo qi)
         {
             Skipped = qi.Skip;
             Taken = qi.Take;
