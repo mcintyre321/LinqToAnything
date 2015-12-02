@@ -34,7 +34,7 @@ Wrap it as a `Func<QueryInfo, IEnumerable<T>>` delegate
             .Where(c => c.PropertyName == "Category" && c.Operator == "Equals")
             .Select(c => c.Value);
 
-        return GetProducts(queryInfo.Take, queryInfo.Skip, category);
+        return GetProductsFromSproc(queryInfo.Take, queryInfo.Skip, category);
     };
 
 
