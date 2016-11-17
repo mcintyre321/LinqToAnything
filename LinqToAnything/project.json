@@ -16,10 +16,10 @@
     "summary": "A library that makes it very easy to create an IQueryable for any datasource"
   },
   "tools": {
-    "dotnet-version": ""
+    "dotnet-version": "1.2.0"
   },
   "dependencies": {
-    "NETStandard.Library": "",
+    "NETStandard.Library": "1.6.1",
     "QueryInterceptor.Core": "1.0.4",
     "System.Linq.Dynamic.Core": "1.0.6.8"
   },
