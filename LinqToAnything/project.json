@@ -16,7 +16,7 @@
     "summary": "A library that makes it very easy to create an IQueryable for any datasource"
   },
   "tools": {
-    "dotnet-version": "1.2.0"
+    "dotnet-version": "1.1.0"
   },
   "dependencies": {
     "QueryInterceptor.Core": "1.0.4",
