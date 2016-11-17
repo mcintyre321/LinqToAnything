@@ -1,17 +1,13 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqToAnything", "LinqToAnything\LinqToAnything.csproj", "{A4445A36-C2D6-4747-8F93-893BFFD2EF76}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqToAnything.Tests", "LinqToAnything.Tests\LinqToAnything.Tests.csproj", "{B592565D-E3BF-406D-A0DA-F508DBEC7854}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4163E8C6-7796-4145-934C-8DE641A970CE}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
+	ProjectSection(ProjectDependencies) = postProject
+		{0944BE53-451C-403A-A1DE-4696EA831166} = {0944BE53-451C-403A-A1DE-4696EA831166}
 	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "LinqToAnything", "LinqToAnything\LinqToAnything.xproj", "{0944BE53-451C-403A-A1DE-4696EA831166}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +15,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A4445A36-C2D6-4747-8F93-893BFFD2EF76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A4445A36-C2D6-4747-8F93-893BFFD2EF76}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A4445A36-C2D6-4747-8F93-893BFFD2EF76}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A4445A36-C2D6-4747-8F93-893BFFD2EF76}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B592565D-E3BF-406D-A0DA-F508DBEC7854}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B592565D-E3BF-406D-A0DA-F508DBEC7854}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B592565D-E3BF-406D-A0DA-F508DBEC7854}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B592565D-E3BF-406D-A0DA-F508DBEC7854}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0944BE53-451C-403A-A1DE-4696EA831166}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0944BE53-451C-403A-A1DE-4696EA831166}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0944BE53-451C-403A-A1DE-4696EA831166}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0944BE53-451C-403A-A1DE-4696EA831166}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

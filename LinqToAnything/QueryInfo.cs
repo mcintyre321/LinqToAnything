@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net.Mail;
 using System.Linq.Dynamic;
+using System.Linq.Dynamic.Core;
+
 namespace LinqToAnything
 {
     /// <summary>
@@ -56,7 +57,7 @@ namespace LinqToAnything
                 var orderBy = qi.OrderBy.Name;
                 if (this.OrderBy.Direction == OrderBy.OrderByDirection.Desc)
                     orderBy += " descending";
-                q = q.OrderBy(orderBy);
+                q.OrderBy(orderBy);
             }
 
             if (qi.Skip > 0) q = q.Skip(qi.Skip);

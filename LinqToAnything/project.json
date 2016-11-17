@@ -1,0 +1,36 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "Turn any data source into an IQueryable",
+  "copyright": "Harry McIntyre",
+  "title": "LinqToAnything",
+  "authors": [ "Harry McIntyre @mcintyre321" ],
+  "packOptions": {
+    "projectUrl": "https://github.com/mcintyre321/LinqToAnything",
+    "owners": [ "Harry McIntyre @mcintyre321" ],
+    "tags": [ "LINQ, Expression, IQueryable, Provider" ],
+    "licenseUrl": "https://github.com/mcintyre321/LinqToAnything/blob/master/LICENSE.md",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/mcintyre321/LinqToAnything.git"
+    },
+    "summary": "A library that makes it very easy to create an IQueryable for any datasource"
+  },
+  "tools": {
+    "dotnet-version": ""
+  },
+  "dependencies": {
+    "NETStandard.Library": "",
+    "QueryInterceptor.Core": "1.0.4",
+    "System.Linq.Dynamic.Core": "1.0.6.8"
+  },
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "dnxcore50"
+    },
+    "net451": {
+      "frameworkAssemblies": {
+      }
+    }
+
+  }
+}

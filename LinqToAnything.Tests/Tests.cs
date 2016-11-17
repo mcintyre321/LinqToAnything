@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using NUnit.Framework;
 using LinqToAnything;
-using System.Linq.Dynamic;
+using System.Linq.Dynamic.Core;
 namespace LinqToAnything.Tests
 {
     [TestFixture]

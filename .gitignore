@@ -27,3 +27,4 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 [Aa]pp_[Dd]ata*/
 packages
+/LinqToAnything/project.lock.json
