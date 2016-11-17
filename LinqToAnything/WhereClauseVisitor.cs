@@ -83,7 +83,10 @@ namespace LinqToAnything
                 }
                 filter.Expression = Expression.Lambda(node, parameter);
                 filter.Operator = node.NodeType.ToString();
-                filter.Value = GetValueFromExpression(node.Right);
+                var valueNode = parameter != null && parameter == (node.Right as MemberExpression)?.Expression
+                    ? node.Left
+                    : node.Right;
+                filter.Value = GetValueFromExpression(valueNode);
                 _filters.Add(filter);
                 return node;
             }
@@ -103,6 +106,7 @@ namespace LinqToAnything
 
             if (member != null)
             {
+                //LambdaExpression lambda = Expression.Lambda(member.Body, member.Parameters.Single());
                 return Expression.Lambda(member).Compile().DynamicInvoke();
             }
 
