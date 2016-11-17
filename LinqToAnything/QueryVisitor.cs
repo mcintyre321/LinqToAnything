@@ -59,6 +59,7 @@ namespace LinqToAnything
                         LambdaBody = body
                     };
                 }
+
                 else if (m.Method.Name.Equals("OrderByDescending"))
                 {
                     MethodCallExpression call = m;
@@ -81,6 +82,13 @@ namespace LinqToAnything
                     whereClauseVisitor.Visit(whereClause);
                     QueryInfo.Clauses = QueryInfo.Clauses.Concat((whereClauseVisitor.Filters)).ToArray();
                 }
+                else if (m.Method.Name.Equals("Single")) { }
+                else if (m.Method.Name.Equals("Count")) { }
+                else
+                {
+                    throw new NotImplementedException($"Operator {m.Method.Name} not supported. Please update the project at https://github.com/mcintyre321/LinqToAnything/blob/master/LinqToAnything/QueryVisitor.cs");
+                }
+                
 
             }
             return m;
