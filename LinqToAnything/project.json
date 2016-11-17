@@ -19,7 +19,6 @@
     "dotnet-version": "1.2.0"
   },
   "dependencies": {
-    "NETStandard.Library": "1.6.1",
     "QueryInterceptor.Core": "1.0.4",
     "System.Linq.Dynamic.Core": "1.0.6.8"
   },
