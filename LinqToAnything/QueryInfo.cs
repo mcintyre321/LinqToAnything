@@ -57,7 +57,7 @@ namespace LinqToAnything
                 var orderBy = qi.OrderBy.Name;
                 if (this.OrderBy.Direction == OrderBy.OrderByDirection.Desc)
                     orderBy += " descending";
-                q.OrderBy(orderBy);
+                q = q.OrderBy(orderBy);
             }
 
             if (qi.Skip > 0) q = q.Skip(qi.Skip);
