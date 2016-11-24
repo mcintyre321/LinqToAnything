@@ -53,30 +53,83 @@ namespace LinqToAnything.Tests
 
         }
 
-        [Test]
-        public void CanDoASimpleGroupBy()
+        public class GroupByTests
         {
-            QueryInfo info = null;
+            [Test]
+            public void CanDoAInterceptedGroupBy()
+            {
+                QueryInfo info = null;
 
-            var items =   Enumerable.Range(0, 99)
-                .Select(i => new SomeEntity()
+                var items = Enumerable.Range(0, 99)
+                    .Select(i => new SomeEntity()
+                    {
+                        Name = "User" + i,
+                        Index = i,
+                        Site = i/10,
+                        Category = i/5
+                    })
+                    .ToArray();
+                var pq = DelegateQueryable.Create<SomeEntity>((queryInfo) =>
                 {
-                    Name = "User" + i,
-                    Index = i,
-                    Site = i/10
-                })
-                .ToArray();
+                    info = queryInfo;
+                    var groupByClause = info.GroupBy;                    
+                    return items.GroupBy(x => x.Category);
+                });
 
-            var pq = DelegateQueryable.Create<SomeEntity>((queryInfo) => {
-                info = queryInfo;
-                var groupByClause = info.Clauses.OfType<GroupByClause>().Single();
-                return items.AsQueryable().GroupBy(groupByClause.PropertyNames.Single());
-                
-            });
+                var groups = pq.GroupBy(x => x.Index).ToArray();
+                var numberofCategoryGroups = 20;
+                Assert.AreEqual(numberofCategoryGroups, groups.Count());
+            }
 
-            var groups = pq.GroupBy(x => x.Site).ToArray();
-            Assert.AreEqual(10, groups.Count());
+
+            [Test]
+            public void CanDoADynamicInterceptedGroupBy()
+            {
+                QueryInfo info = null;
+
+                var items = Enumerable.Range(0, 99)
+                    .Select(i => new SomeEntity()
+                    {
+                        Name = "User" + i,
+                        Index = i,
+                        Site = i / 10,
+                        Category = i / 5
+                    })
+                    .ToArray().AsQueryable();
+                var pq = DelegateQueryable.Create<SomeEntity>((queryInfo) =>
+                {
+                    info = queryInfo;
+                    return items.GroupBy("Site");
+                });
+
+                var groups = pq.GroupBy(x => x.Index).ToArray();
+                var numberofCategoryGroups = 10;
+                Assert.AreEqual(numberofCategoryGroups, groups.Count());
+            }
+
+            [Test]
+            public void CanDoAnUninterceptedGroupBy()
+            {
+                QueryInfo info = null;
+
+                var items = Enumerable.Range(0, 99)
+                    .Select(i => new SomeEntity()
+                    {
+                        Name = "User" + i,
+                        Index = i,
+                        Site = i/10
+                    })
+                    .ToArray();
+
+                var pq = DelegateQueryable.Create<SomeEntity>(q => items);
+
+                var groups = pq.GroupBy(x => x.Site).ToArray();
+                Assert.AreEqual(10, groups.Count());
+            }
+ 
+
         }
+
         [Test]
         public void CanDoASingleWithAFilter()
         {
@@ -520,6 +573,7 @@ namespace LinqToAnything.Tests
         public string Name { get; set; }
         public int Index { get; set; }
         public int Site { get; set; }
+        public int Category { get; set; }
     }
 
     public class Projection

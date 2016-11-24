@@ -82,6 +82,22 @@ namespace LinqToAnything
                     whereClauseVisitor.Visit(whereClause);
                     QueryInfo.Clauses = QueryInfo.Clauses.Concat((whereClauseVisitor.Filters)).ToArray();
                 }
+                else if (m.Method.Name.Equals("GroupBy"))
+                {
+                    MethodCallExpression call = m;
+                    LambdaExpression keyExpression = (LambdaExpression)ExpressionUtils.RemoveQuotes(call.Arguments[1]);
+                    Expression body = ExpressionUtils.RemoveQuotes(keyExpression.Body);
+                    QueryInfo.GroupBy = new GroupBy()
+                    {
+                        KeySelector = new ExpressionUtils.SelectCallMatch
+                        {
+                            MethodCall = call,
+                            Source = call.Arguments[0],
+                            Lambda = keyExpression,
+                            LambdaBody = body
+                        }
+                    };
+                }
                 else if (m.Method.Name.Equals("Single"))
                 {
                     QueryInfo.ResultType = new Single();
@@ -104,9 +120,11 @@ namespace LinqToAnything
 
         public Func<TIn, TOut> Transform<TIn, TOut>()
         {
-            if (Select == null) return new Func<TIn, TOut>(i => (TOut) (object) i);
+            if (Select == null) return i => (TOut) (object) i;
             return (Func<TIn, TOut>) Select.Lambda.Compile();
         }
+
+       
     }
 
 }

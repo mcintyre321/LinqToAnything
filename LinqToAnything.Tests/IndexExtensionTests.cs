@@ -37,10 +37,48 @@ namespace LinqToAnything.Tests
             joined.ToArray();
         }
 
+        [Test]
+        public void TestForIndexExtension2()
+        {
+            var users = new List<User>()
+            {
+                new User {UserId = 123, Role = "m", Team = "p"},
+                new User {UserId = 456, Role = "j", Team = "p"},
+                new User {UserId = 456, Role = "j", Team = "q"},
+                new User {UserId = 789, Role = "j", Team = "q"},
+                new User {UserId = 012, Role = "m", Team = "1"},
+            }.AsQueryable().AutoIndex();
+
+            var filtered = users.Where(u => u.Team == "p").Where(u => u.Role == "m");
+
+            Assert.AreEqual(1, filtered.ToArray().Count());
+        }
+        [Test]
+        public void GroupTest()
+        {
+            var users = new List<User>()
+            {
+                new User {UserId = 123, Role = "m", Team = "p"},
+                new User {UserId = 456, Role = "j", Team = "p"},
+                new User {UserId = 456, Role = "j", Team = "q"},
+                new User {UserId = 789, Role = "j", Team = "q"},
+                new User {UserId = 012, Role = "m", Team = "1"},
+            }.AsQueryable().AutoIndex();
+
+            var groups = users.GroupBy(u => u.Team);
+
+            Assert.AreEqual(3, groups.ToArray().Count());
+            var teamP = groups.Single(g => g.Key == "p");
+            Assert.AreEqual(2, teamP.Count());
+
+        }
+
 
         class User
         {
             public int UserId { get; set; }
+            public string Role { get; set; }
+            public string Team { get; set; }
         }
 
         class Friendship

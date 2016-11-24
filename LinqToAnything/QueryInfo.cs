@@ -42,11 +42,13 @@ namespace LinqToAnything
                 Skip = this.Skip,
                 OrderBy = this.OrderBy?.Clone(),
                 Clauses = this.Clauses.Select(c => c.Clone()).ToList(),
-                ResultType =  this.ResultType?.Clone()
+                ResultType =  this.ResultType?.Clone(),
+                GroupBy =  this.GroupBy
             };
         }
 
         public ResultType ResultType { get; set; }
+        public GroupBy GroupBy { get; set; }
 
         public IQueryable<T> ApplyTo<T>(IQueryable<T> q)
         {
