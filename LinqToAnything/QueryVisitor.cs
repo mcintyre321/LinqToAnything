@@ -82,8 +82,14 @@ namespace LinqToAnything
                     whereClauseVisitor.Visit(whereClause);
                     QueryInfo.Clauses = QueryInfo.Clauses.Concat((whereClauseVisitor.Filters)).ToArray();
                 }
-                else if (m.Method.Name.Equals("Single")) { }
-                else if (m.Method.Name.Equals("Count")) { }
+                else if (m.Method.Name.Equals("Single"))
+                {
+                    QueryInfo.ResultType = new Single();
+                }
+                else if (m.Method.Name.Equals("Count"))
+                {
+                    QueryInfo.ResultType = new Count();
+                }
                 else
                 {
                     throw new NotImplementedException($"Operator {m.Method.Name} not supported. Please update the project at https://github.com/mcintyre321/LinqToAnything/blob/master/LinqToAnything/QueryVisitor.cs");

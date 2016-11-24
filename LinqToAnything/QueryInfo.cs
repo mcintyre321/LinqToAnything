@@ -40,10 +40,13 @@ namespace LinqToAnything
             {
                 Take = this.Take,
                 Skip = this.Skip,
-                OrderBy = this.OrderBy == null ? null : this.OrderBy.Clone(),
-                Clauses = this.Clauses.Select(c => c.Clone()).ToList()
+                OrderBy = this.OrderBy?.Clone(),
+                Clauses = this.Clauses.Select(c => c.Clone()).ToList(),
+                ResultType =  this.ResultType?.Clone()
             };
         }
+
+        public ResultType ResultType { get; set; }
 
         public IQueryable<T> ApplyTo<T>(IQueryable<T> q)
         {

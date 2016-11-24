@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -8,15 +9,13 @@ namespace LinqToAnything
 {
     public class QueryProvider<T> : IQueryProvider
     {
-        private readonly Func<QueryInfo, IEnumerable<T>> _dataQuery;
-        private readonly Func<QueryInfo, int> countQuery;
-        private QueryVisitor _queryVisitor;
+        private readonly Func<QueryInfo, object> _dataQuery;
+        private readonly QueryVisitor _queryVisitor;
 
 
-        public QueryProvider(Func<QueryInfo, IEnumerable<T>> dataQuery, Func<QueryInfo, int> countQuery, QueryVisitor queryVisitor = null)
+        public QueryProvider(Func<QueryInfo, object> dataQuery, QueryVisitor queryVisitor = null)
         {
             _dataQuery = dataQuery;
-            this.countQuery = countQuery;
             this._queryVisitor = queryVisitor ?? new QueryVisitor();
         }
 
@@ -31,10 +30,10 @@ namespace LinqToAnything
             queryVisitor.Visit(expression);
             if (typeof(TElement) != typeof(T))
             {
-                Func<QueryInfo, IEnumerable<TElement>> q = info => _dataQuery(info).Select(queryVisitor.Transform<T, TElement>());
-                return new DelegateQueryable<TElement>(q, countQuery, null, queryVisitor);
+                Func<QueryInfo, object> q = info => ((IEnumerable)_dataQuery(info)).Cast<T>().Select(queryVisitor.Transform<T, TElement>());
+                return new DelegateQueryable<TElement>(q, null, queryVisitor);
             }
-            return new DelegateQueryable<TElement>((Func<QueryInfo, IEnumerable<TElement>>)((object)_dataQuery), countQuery, expression, queryVisitor);
+            return new DelegateQueryable<TElement>(_dataQuery, expression, queryVisitor);
  
         }
 
@@ -43,11 +42,6 @@ namespace LinqToAnything
         {
             var queryVisitor = new QueryVisitor(_queryVisitor.QueryInfo.Clone());
             var results = _dataQuery(queryVisitor.QueryInfo);
-            //if (countQuery.Select != null)
-            //{
-            //    var projectionFunc = (Func<T, TResult>)countQuery.Select.Lambda.Compile();
-            //    return results.Select(projectionFunc);
-            //}
             return (IEnumerable<TResult>) results;
         }
 
@@ -62,12 +56,26 @@ namespace LinqToAnything
             
             var queryVisitor = new QueryVisitor(_queryVisitor.QueryInfo.Clone());
             queryVisitor.Visit(expression);
-            if (methodCallExpression.Method.Name == "Count" && typeof(TResult) == typeof(int))
+
+            var dataQueryResult = _dataQuery(queryVisitor.QueryInfo);
+
+            if (methodCallExpression.Method.Name == "Count")
             {
-                return (TResult) (object) countQuery(queryVisitor.QueryInfo);
+                if (dataQueryResult is IEnumerable)
+                {
+                    return (TResult)(object)((IEnumerable<object>)dataQueryResult).Count();
+                }else if (dataQueryResult is TResult)
+                {
+                    return (TResult) dataQueryResult;
+                }
+            }
+            if (methodCallExpression.Method.Name == "Single")
+            {
+
+                return (TResult)(object)((IEnumerable<object>)dataQueryResult).Single();
             }
 
-            var array = _dataQuery(queryVisitor.QueryInfo).ToList();
+            var array = ((IEnumerable)dataQueryResult).Cast<IEnumerable<object>>().ToList();
             var data = array.AsQueryable();
 
             var newExp = Expression.Call(methodCallExpression.Method, Expression.Constant(data));
@@ -75,43 +83,43 @@ namespace LinqToAnything
         }
     }
 
-    public class SwitchoutArgumentVisitor : ExpressionVisitor
-    {
-        private readonly object arg;
+    //public class SwitchoutArgumentVisitor : ExpressionVisitor
+    //{
+    //    private readonly object arg;
 
-        public SwitchoutArgumentVisitor(object arg)
-        {
-            this.arg = arg;
-        }
+    //    public SwitchoutArgumentVisitor(object arg)
+    //    {
+    //        this.arg = arg;
+    //    }
 
-        protected override Expression VisitConstant(ConstantExpression node)
-        {
-            return Expression.Constant(arg);
-        }
-    }
+    //    protected override Expression VisitConstant(ConstantExpression node)
+    //    {
+    //        return Expression.Constant(arg);
+    //    }
+    //}
 
-    internal class SwitchoutVisitor<T> : ExpressionVisitor
-    {
-        private readonly object data;
+    //internal class SwitchoutVisitor<T> : ExpressionVisitor
+    //{
+    //    private readonly object data;
 
-        public SwitchoutVisitor(object data)
-        {
-            this.data = data;
-        }
+    //    public SwitchoutVisitor(object data)
+    //    {
+    //        this.data = data;
+    //    }
 
 
-        public override Expression Visit(Expression node)
-        {
-            return base.Visit(node);
-        }
+    //    public override Expression Visit(Expression node)
+    //    {
+    //        return base.Visit(node);
+    //    }
 
-        protected override Expression VisitConstant(ConstantExpression node)
-        {
-            if (node.Value != null && node.Value is T)
-            {
-                return Expression.Constant(data);
-            }
-            return base.VisitConstant(node);
-        }
-    }
+    //    protected override Expression VisitConstant(ConstantExpression node)
+    //    {
+    //        if (node.Value != null && node.Value is T)
+    //        {
+    //            return Expression.Constant(data);
+    //        }
+    //        return base.VisitConstant(node);
+    //    }
+    //}
 }

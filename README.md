@@ -13,6 +13,7 @@ Take one paged data access method:
 ```
     
     public void IEnumerable<Product> GetProductsFromSproc(int skip, int take, string category) { ... };
+	public void IEnumerable<Product> GetCountOfProductsInCategoryFromSproc(int skip, int take, string category) { ... };
     
     class Product{
         public string Id {get;set;}
@@ -22,7 +23,7 @@ Take one paged data access method:
     }
 ```
 
-Wrap it as a `Func<QueryInfo, IEnumerable<T>>` delegate
+Wrap it as a `Func<QueryInfo, object*>` delegate. ** note that 
 
 
 ```
@@ -33,13 +34,16 @@ Wrap it as a `Func<QueryInfo, IEnumerable<T>>` delegate
         var category = queryInfo.Clauses.OfType<Where>()
             .Where(c => c.PropertyName == "Category" && c.Operator == "Equals")
             .Select(c => c.Value);
+		
+		if (queryInfo.Clauses.OfType<CountClause.Any())
+			return GetCountOfProductsInCategoryFromSproc(category);
 
         return GetProductsFromSproc(queryInfo.Take, queryInfo.Skip, category);
     };
 
 
     //Now we can create our queryable using the wrapper delegate
-    IQuerable<Product> queryable = new DelegateQueryable<string>(wrapper)
+    IQuerable<Product> queryable = DelegateQueryable<Product>.Create(wrapper);
 
 ```
 
@@ -51,4 +55,4 @@ A QueryInfo object contains:
 
 Please see [QueryInfo.cs](https://github.com/mcintyre321/LinqToAnything/blob/master/LinqToAnything/QueryInfo.cs) for info on what queries are supported, and what operators you can use.
  
-It makes it easy to disassemble and reconstruct Linq queries, so you can do custom stuff to them.
+It makes it easy to disassemble and reconstruct Linq queries, so you can do custom stuff to them, like:
