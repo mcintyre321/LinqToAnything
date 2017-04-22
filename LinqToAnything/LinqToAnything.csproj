@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Turn any data source into an IQueryable</Description>
+    <Copyright>Harry McIntyre</Copyright>
+    <AssemblyTitle>LinqToAnything</AssemblyTitle>
+    <Authors>Harry McIntyre @mcintyre321</Authors>
+    <TargetFrameworks>netstandard1.6;net451</TargetFrameworks>
+    <AssemblyName>LinqToAnything</AssemblyName>
+    <PackageId>LinqToAnything</PackageId>
+    <PackageTags>LINQ, Expression, IQueryable, Provider</PackageTags>
+    <PackageProjectUrl>https://github.com/mcintyre321/LinqToAnything</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/mcintyre321/LinqToAnything/blob/master/LICENSE.md</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/mcintyre321/LinqToAnything.git</RepositoryUrl>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="QueryInterceptor.Core" Version="1.0.5" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.6.8" />
+    <PackageReference Include="System.Reflection" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="dotnet-version" Version="1.1.0" />
+  </ItemGroup>
+
+</Project>
