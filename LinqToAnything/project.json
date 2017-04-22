@@ -19,7 +19,7 @@
     "dotnet-version": "1.1.0"
   },
   "dependencies": {
-    "QueryInterceptor.Core": "1.0.4",
+    "QueryInterceptor.Core": "1.0.5",
     "System.Linq.Dynamic.Core": "1.0.6.8",
     "System.Reflection": "4.3.0"
   },
