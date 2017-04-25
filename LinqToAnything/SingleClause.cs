@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-
 namespace LinqToAnything
 {
     public class Single : ResultType

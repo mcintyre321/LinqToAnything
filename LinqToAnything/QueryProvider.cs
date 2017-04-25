@@ -5,7 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using LinqToAnything.HelperTypes;
 using System.Linq.Dynamic.Core;
-using QueryInterceptor;
 
 namespace LinqToAnything
 {
