@@ -19,7 +19,6 @@
   <ItemGroup>
     <PackageReference Include="QueryInterceptor.Core" Version="1.0.5" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.6.8" />
-    <PackageReference Include="System.Reflection" Version="4.3.0" />
   </ItemGroup>
  
 
