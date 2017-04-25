@@ -4,14 +4,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
 
 namespace LinqToAnything.Tests
 {
 
     public class IndexExtensionTests
     {
-        [Test]
+        [Fact]
         public void TestForIndexExtension()
         {
             var users = new List<User>()
@@ -37,7 +37,7 @@ namespace LinqToAnything.Tests
             joined.ToArray();
         }
 
-        [Test]
+        [Fact]
         public void TestForIndexExtension2()
         {
             var users = new List<User>()
@@ -51,9 +51,9 @@ namespace LinqToAnything.Tests
 
             var filtered = users.Where(u => u.Team == "p").Where(u => u.Role == "m");
 
-            Assert.AreEqual(1, filtered.ToArray().Count());
+            Assert.Equal(1, filtered.ToArray().Count());
         }
-        [Test]
+        [Fact]
         public void GroupTest()
         {
             var users = new List<User>()
@@ -67,9 +67,9 @@ namespace LinqToAnything.Tests
 
             var groups = users.GroupBy(u => u.Team);
 
-            Assert.AreEqual(3, groups.ToArray().Count());
+            Assert.Equal(3, groups.ToArray().Count());
             var teamP = groups.Single(g => g.Key == "p");
-            Assert.AreEqual(2, teamP.Count());
+            Assert.Equal(2, teamP.Count());
 
         }
 

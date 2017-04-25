@@ -5,7 +5,7 @@
     <Copyright>Harry McIntyre</Copyright>
     <AssemblyTitle>LinqToAnything</AssemblyTitle>
     <Authors>Harry McIntyre @mcintyre321</Authors>
-    <TargetFrameworks>netstandard1.6</TargetFrameworks>
+    <TargetFramework>netstandard1.3</TargetFramework>
     <AssemblyName>LinqToAnything</AssemblyName>
     <PackageId>LinqToAnything</PackageId>
     <PackageTags>LINQ, Expression, IQueryable, Provider</PackageTags>
